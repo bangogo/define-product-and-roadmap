@@ -1,0 +1,20 @@
+已按 `define-product-and-roadmap` 产出并对齐两份中文文档，且内容只基于 `evidence/README.md`，没有联网，也没有实现产品。
+
+- PRD： [product-requirements.md](/tmp/dpr-cend-codex.yfBEj9/docs/product/product-requirements.md)
+- Roadmap： [product-roadmap.md](/tmp/dpr-cend-codex.yfBEj9/docs/product/product-roadmap.md)
+
+我运行了 skill 要求的精确校验命令：
+
+```bash
+python3 .agents/skills/define-product-and-roadmap/scripts/validate_product_docs.py \
+  --prd docs/product/product-requirements.md \
+  --roadmap docs/product/product-roadmap.md
+```
+
+实际结果是 `validation passed`，并带 1 个 warning：`PRD remains not approval-ready because must-be-true assumptions are unresolved: ['老年用户愿意独立在线办理至少一类事项']`。这次不需要再修结构错误。
+
+**验证边界**
+
+校验器证明的边界只有一层：`structural and cross-document consistency only`。也就是它只证明这两个精确文件的结构、命名、表格、元数据和跨文档一致性通过了 skill 规则；它不证明产品判断正确、不证明真实用户价值成立、不证明运行态、不证明实现可行，也不代表已经获批。
+
+我另外按 skill rubric 做了语义自查，但那只是自查，不是独立评审。当前文档状态仍然是 `Proposed`，且 `是否具备审批条件：否`，原因就是上面那条 `必须为真` 假设还没被研究确认。

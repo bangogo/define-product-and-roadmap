@@ -2,11 +2,25 @@
 
 ## Contents
 
-1. Evidence and current-effect snapshot
-2. Product-shape classification
-3. Delivery purpose and value bottleneck
-4. Question and divergence workflow
-5. Assumption register and completion gate
+1. Operation and authority
+2. Evidence and current-effect snapshot
+3. Product-shape classification
+4. Risk modifiers and delivery purpose
+5. Question and divergence workflow
+6. Assumption register and completion gate
+
+## Operation and authority
+
+Classify the requested operation before changing files:
+
+| Operation | Allowed result | Default mutation rule |
+|---|---|---|
+| Audit only | Findings, evidence, severity, and repair proposal | Do not edit product documents |
+| Create | New PRD, Roadmap, or aligned pair | Create only requested deliverables |
+| Rewrite | Replacement document plus material-change summary | Preserve originals through version control or a new path |
+| Align | Reconcile an existing PRD/Roadmap pair and current-state entrypoint | Touch only required files; preserve project authority |
+
+Record the reviewer, requested decision, and exact next gate. A product contract can authorize only that gate. It cannot silently authorize Build, publication, live accounts, sensitive-data use, transactions, or external writes.
 
 ## Evidence and current-effect snapshot
 
@@ -14,25 +28,39 @@ Build this private brief before drafting:
 
 | Field | Required result |
 |---|---|
-| Product user | Person or team receiving the product value |
-| Core task | Recognizable task the user needs to complete |
+| Product user | Person or team receiving lasting product value |
+| Core task | Recognizable job the product user needs to complete |
 | Current effect | What the product currently lets the user do or receive |
-| Evidence | Screen, route, artifact, output, record, interface, research, or observed result |
-| Evidence status | Confirmed decision, observed, documented, simulated, test, manual, or unverified |
-| Value surface | Where the user actually receives the benefit |
-| Delivery purpose | Decision demo, user validation, production improvement, integration, pilot, or scale |
+| Value surface | Where the benefit becomes visible or usable |
 | Value path | Shortest route from trigger or input to meaningful result |
 | Value bottleneck | First missing or weak transition that blocks the result |
-| Existing foundation | Working pages, content, data, interfaces, services, Skills, or processes |
-| Truth boundary | Frontend, backend, data, external service, model, manual, and permission state |
+| Existing foundation | Working pages, artifacts, data, interfaces, services, Skills, or processes |
+| Truth boundary | Frontend, backend, data, model, external service, manual, permission, and output state |
+| Delivery purpose | Decision demo, user-value validation, production improvement, integration validation, real pilot, or scale |
 | Review gate | Reviewer, requested decision, and next gate activated |
 
-Use this published snapshot table:
+Maintain a compact evidence ledger for every material conclusion:
 
-| Observation | Current effect | Evidence status | Evidence source | Current gap |
+| Claim or observation | Classification | Source | Date/revision | Confidence | Conflict or limitation |
+|---|---|---|---|---|---|
+
+Use these classifications:
+
+- `已确认决策`: explicitly approved and still authoritative;
+- `已观察证据`: directly inspected current behavior or artifact;
+- `文档记载`: stated by a current document but not independently observed;
+- `历史证据`: useful precedent that may be stale;
+- `建议假设，待确认`: reversible or material proposal awaiting a decision;
+- `待调研`: external or project fact that cannot safely be inferred.
+
+When sources conflict, prefer the higher-authority and newer source only after confirming it still governs the same scope. Publish the conflict if it changes the product direction or approval readiness.
+
+Use this current-effect table in the PRD:
+
+| 观察对象 | 当前效果 | 证据状态 | 证据来源 | 当前缺口 |
 |---|---|---|---|---|
 
-Separate current and target behavior. A target becomes current only after evidence exists at the declared level.
+The ledger classifications above describe where a claim came from. They are not runtime truth states. In the published current-effect table, the column named `证据状态` uses only the canonical truth states `真实`, `测试接入`, `模拟`, `人工承接`, `仅有文档`, `已观察`, `尚未验证`, and `历史证据`. The same set applies to every published `真实性` cell. A target becomes current only after evidence exists at the declared level. A command exit code, HTTP 200, fixture, transcript, or document statement proves only its own layer.
 
 ## Product-shape classification
 
@@ -43,26 +71,46 @@ Classify through six dimensions:
 | Primary beneficiary | Consumer, business user, internal operator, creator, developer, buyer/seller, or service staff |
 | Primary value surface | Consumer interface, content/artifact production, internal workflow, API/platform, service orchestration, marketplace, or physical/hybrid |
 | Evidence stage | Idea, static design, interactive prototype, test integration, limited real use, or live/scale |
-| Delivery purpose | Decision demo, user validation, production improvement, integration validation, real pilot, or scale |
-| Value bottleneck | Comprehension, activation, task completion, artifact quality, throughput, reliability, adoption, handoff, or cost |
+| Delivery purpose | Decision demo, user-value validation, production improvement, integration validation, real pilot, or scale |
+| Value bottleneck | Comprehension, activation, task completion, artifact quality, throughput, reliability, adoption, handoff, trust, or cost |
 | Risk modifier | AI, sensitive data, external write, third-party reuse/license, publishing, transaction, or high-stakes decision |
 
-Select one primary shape and up to two secondary shapes. For a hybrid product, name the primary value surface instead of labeling every surface equally.
+Select exactly one primary shape from:
+
+- `C端交互产品`
+- `内容/产物生产`
+- `内部流程工具`
+- `API/平台`
+- `服务编排`
+- `交易/市场`
+
+Select no more than two secondary shapes from the same list. For a hybrid product, name the primary value surface rather than labeling every surface equally. Put AI and risk conditions in `风险修饰项`, not `次级形态`.
 
 ### Shape-specific observation lenses
 
 | Product shape | Inspect first | Meaningful result |
 |---|---|---|
 | C-end interaction | Page inventory, entry points, information hierarchy, user route, state transitions, mobile/accessibility | User completes a task and understands the result |
-| Content/artifact production | Input contract, production stages, intermediate/final artifacts, quality, provenance, review, recovery | User receives a usable and reviewable artifact |
+| Content/artifact production | Input contract, stages, intermediate/final artifacts, quality, provenance, review, recovery | User receives a usable and reviewable artifact |
 | Internal workflow | Roles, trigger, queue, decisions, approval, handoff, exception, audit | Operator completes a real work item |
 | API/platform | Consumer, onboarding, first success, contract, examples, self-service, compatibility, reliability | A new consumer reaches first successful use |
 | Service orchestration | Touchpoints, providers, responsibility, online/offline handoff, return and support | User receives the service outcome, not only a link |
 | Marketplace | Both sides, discovery, match, trust, transaction, fulfillment, settlement, dispute | Both sides complete a protected exchange |
 
-AI assistant or Agent is usually a secondary shape or risk modifier. Inspect its trigger, context, role, control, action boundary, output, uncertainty, feedback, fallback, and evaluation.
+## Risk modifiers and delivery purpose
 
-## Delivery purpose and value bottleneck
+Publish zero or more canonical modifiers: `AI`, `敏感数据`, `外部写入`, `第三方复用`, `发布`, `交易`, or `高风险决策`. Use `无` only after checking each modifier.
+
+An AI assistant or Agent is normally a modifier, not a primary shape. Inspect its trigger, context, role, control, action boundary, output, uncertainty, feedback, fallback, and evaluation. A transaction can be both the primary marketplace surface and a risk modifier.
+
+Use these canonical delivery purposes:
+
+- `决策演示`
+- `用户价值验证`
+- `生产改进`
+- `集成验证`
+- `真实试点`
+- `规模化`
 
 Keep four roles separate:
 
@@ -83,7 +131,7 @@ Derive priority by asking:
 
 ## Question and divergence workflow
 
-Resolve project facts from evidence. Ask when an answer changes user, value surface, delivery purpose, primary bottleneck, route order, fidelity, truth boundary, or acceptance.
+Resolve project facts from evidence. Ask only when an answer changes user, value surface, delivery purpose, primary bottleneck, route order, fidelity, truth boundary, or acceptance.
 
 Use one question at a time:
 
@@ -99,13 +147,13 @@ When several directions remain credible, compare 2–3 alternatives:
 | Direction | User value | Business value | Feasibility | Differentiation | Evidence strength | Recommendation |
 |---|---|---|---|---|---|---|
 
-Select a direction before publishing the formal contract. Preserve only the chosen direction, remaining assumptions, and open decisions in the PRD/Roadmap.
+Select a direction before publishing the formal contract. Preserve only the chosen direction, remaining assumptions, and open decisions in the PRD/Roadmap. Keep raw dialogue and rejected options in working context unless the user requests a decision log.
 
 ## Assumption register and completion gate
 
-Use:
+Publish the same material assumptions in both documents:
 
-| Type | Assumption or decision | Status | Evidence | Product impact | Confirmer or next step |
+| 类型 | 假设或决策 | 状态 | 依据 | 对产品影响 | 确认人/下一步 |
 |---|---|---|---|---|---|
 
 Canonical types:
@@ -115,6 +163,6 @@ Canonical types:
 - `可逆默认`: low-risk choice that can be changed later;
 - `高风险外部事实`: requires research or authority rather than inference.
 
-Canonical statuses: `已确认`, `建议假设，待确认`, `待调研`, `已否决`.
+Canonical statuses: `已确认`, `建议假设，待确认`, `待调研`, or `已否决`.
 
-Only `已确认` items may appear as product facts. An unresolved or denied `必须为真` item makes the document `Proposed / Not approval-ready`. Stop questioning when the user, value surface, current effect, delivery purpose, bottleneck, primary route, and truth boundary are stable; defer implementation detail to the active Spec.
+Only confirmed items may appear as product facts. Any unresolved or denied `必须为真` item makes the document `Proposed / Not approval-ready`. Stop questioning when the user, value surface, current effect, delivery purpose, bottleneck, primary route, truth boundary, and next gate are stable; defer implementation detail to the active technical Spec.

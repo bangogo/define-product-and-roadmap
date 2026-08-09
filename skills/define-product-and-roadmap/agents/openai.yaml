@@ -1,4 +1,4 @@
 interface:
   display_name: "产品需求与体验路线图"
-  short_description: "识别产品形态与当前效果，生成可审批、可实施的 PRD 和路线图"
-  default_prompt: "Use $define-product-and-roadmap to inspect current evidence, classify the product shape, close high-impact unknowns, and produce an aligned PRD and experience roadmap."
+  short_description: "基于真实证据创建、审计并对齐产品 PRD 与体验路线图"
+  default_prompt: "Use $define-product-and-roadmap to inspect the current evidence and produce or audit an aligned, approval-bounded PRD and experience Roadmap."

@@ -1,0 +1,12 @@
+{"id":"trigger-prd-create-01","category":"trigger","should_trigger":true,"prompt":"基于项目现有证据，帮我写一份可评审的产品需求文档和体验路线图。","assertions":["识别为 PRD/Roadmap 产品合同任务","先读取项目证据","不把未验证目标写成当前事实"]}
+{"id":"trigger-prd-audit-02","category":"trigger","should_trigger":true,"prompt":"完整审计这份 PRD 的产品价值、当前效果、用户路径和审批条件，只报告不要改。","assertions":["识别为 audit only","不修改文件","按证据与产品形态报告"]}
+{"id":"trigger-roadmap-03","category":"trigger","should_trigger":true,"prompt":"这个 MVP 下一版应该先做哪个体验闭环？请按价值证据重排 Roadmap。","assertions":["识别 Roadmap 任务","从价值瓶颈推导顺序","区分体验版本与技术任务"]}
+{"id":"trigger-content-04","category":"trigger","should_trigger":true,"prompt":"为我们的报告生成流水线写 PRD，重点是输入、产物、质量门、溯源、审核和返工。","assertions":["选择内容/产物生产主形态","加载生产合同","不强制首页路径"]}
+{"id":"trigger-platform-05","category":"trigger","should_trigger":true,"prompt":"审视开发者 API 产品的 onboarding、首次成功、兼容性和版本路线。","assertions":["选择 API/平台形态","关注使用者首次成功","包含兼容、弃用和采用证据"]}
+{"id":"no-trigger-architecture-01","category":"trigger","should_trigger":false,"prompt":"给这个 Python 服务画一张技术架构图。","assertions":["不应仅因出现架构而触发产品合同技能"]}
+{"id":"no-trigger-code-02","category":"trigger","should_trigger":false,"prompt":"修复 validate.py 中的正则表达式 bug，并补单元测试。","assertions":["不应把单纯代码修复升级为 PRD 任务"]}
+{"id":"no-trigger-marketing-03","category":"trigger","should_trigger":false,"prompt":"为新品写一份小红书营销发布计划。","assertions":["不应把营销发布计划误判为产品 Roadmap"]}
+{"id":"no-trigger-project-plan-04","category":"trigger","should_trigger":false,"prompt":"把这周的开发事项拆成项目计划并分配负责人。","assertions":["不应把一般项目计划误判为体验 Roadmap"]}
+{"id":"semantic-cend-01","category":"semantic","should_trigger":true,"fixture":"evals/fixtures/cend-prototype","prompt":"基于附件项目证据，创建对齐的 PRD 与 Roadmap。不要联网，不要实现产品。","assertions":["主形态为 C端交互产品","当前原型与目标行为分离","首版覆盖进入、行动、结果和失败恢复","未确认必须为真项导致 Not approval-ready","两份文档通过结构校验"]}
+{"id":"semantic-artifact-02","category":"semantic","should_trigger":true,"fixture":"evals/fixtures/artifact-pipeline","prompt":"基于附件证据，创建报告生产产品的 PRD 与 Roadmap。不要联网，不要实现产品。","assertions":["主形态为 内容/产物生产","路线围绕可独立使用产物而非页面顺序","包含质量门、溯源、审核和返工","不虚构质量阈值","两份文档通过结构校验"]}
+{"id":"semantic-audit-only-03","category":"semantic","should_trigger":true,"fixture":"evals/fixtures/audit-only","prompt":"完整审计现有 PRD 和 Roadmap，只报告问题，不修改文件。","assertions":["不修改任何 fixture 文件","指出目标态冒充当前效果","指出 PRD 与 Roadmap 元数据冲突","区分结构问题与产品判断问题"]}

@@ -1,0 +1,47 @@
+**Findings**
+1. Critical: the PRD promotes a future target to current product truth. [product-requirements.md](/tmp/dpr-audit-only-v2.4Zan1W/docs/product/product-requirements.md:8) says “already connected to real service” and “can automatically submit user applications,” but its only cited basis at [line 10](/tmp/dpr-audit-only-v2.4Zan1W/docs/product/product-requirements.md:10) is that the roadmap plans service integration in the next version. That is exactly a target-as-current claim, and it collapses the truth boundary from “planned” into “real”.
+
+2. Critical: the PRD and roadmap contradict each other on top-level product metadata. The PRD declares `产品主形态：C端交互产品` and `当前交付目的：规模化` at [lines 3-4](/tmp/dpr-audit-only-v2.4Zan1W/docs/product/product-requirements.md:3), while the roadmap declares `产品主形态：服务编排` and `当前交付目的：决策演示` at [lines 3-4](/tmp/dpr-audit-only-v2.4Zan1W/docs/product/product-roadmap.md:3). This is a material cross-document contract failure, not a wording issue.
+
+3. Critical: the roadmap is a technical task list, not a product-experience route. [product-roadmap.md](/tmp/dpr-audit-only-v2.4Zan1W/docs/product/product-roadmap.md:8) sequences `首页 → 后端 → 测试`, which are implementation buckets rather than user task, user-visible result, validation question, entry/exit evidence, or gate. Under the skill contract, that fails the route test.
+
+4. Critical: neither document identifies a product user, core task, current baseline, bottleneck, or approval gate. The PRD has only one H2 section, `当前效果`, and the roadmap has only `路线`; they do not establish who gets value, where value becomes visible, what currently works, or what exact decision these docs are meant to unlock.
+
+5. Critical: the pair has no trustworthy evidence model. There are no dates, revisions, truth labels, assumptions, risk modifiers, reuse boundaries, or user-visible acceptance criteria. Given the claim at [product-requirements.md:8](/tmp/dpr-audit-only-v2.4Zan1W/docs/product/product-requirements.md:8), the absence of evidence handling is not neutral; it makes the current-state claim unsafe.
+
+**Validator**
+I ran the exact required validator command from the project skill against the existing files. Result: `49 errors, 0 warnings`.
+
+Most serious structural failures:
+- Missing required published metadata in both docs: `文档版本`, `证据截止日期`, `次级形态`, `风险修饰项`, `当前证据阶段`, `适用产品合同`, `文档状态`, `是否具备审批条件`.
+- Cross-document metadata mismatch on `产品主形态` and `当前交付目的`.
+- PRD and roadmap outlines do not match the required contracts at all.
+- All required evidence-bearing tables are absent.
+- No module/capability/version coding exists in the required form.
+
+**Semantic Review**
+Score: `0/24`
+Result: `semantic_fail`
+Review independence: `performed` self-review, not independent.
+
+Approval blockers:
+- Current behavior is materially unsupported and mislabeled as current truth.
+- Product user and primary value surface are mixed across the pair.
+- PRD and roadmap disagree on shape and current purpose.
+- Current version has no user-visible exit evidence.
+- The roadmap does not define product versions; it defines implementation tasks.
+
+Weakest dimensions:
+- Current effect and evidence
+- Product-shape fit
+- Roadmap logic
+- Cross-document consistency
+- Truth, risk, and authority
+
+**Proof Boundaries**
+This audit covers only the exact bytes of [product-requirements.md](/tmp/dpr-audit-only-v2.4Zan1W/docs/product/product-requirements.md:1) and [product-roadmap.md](/tmp/dpr-audit-only-v2.4Zan1W/docs/product/product-roadmap.md:1), plus the validator result required by the project skill. I did not inspect runtime behavior, broader repo evidence, user research, or external systems, and I did not edit any file. So this review proves structural non-compliance and document-level product/evidence failures only; it does not prove what the product actually does today.
+
+Exact revisions reviewed:
+- Git `HEAD`: `42a56b00d002d871757f1270e2f5abf5a6db2e1a`
+- PRD SHA-256: `e031bab5e21bda2b5eb8343f523576a7b0be07343a75120035fd6f2bfdabce4d`
+- Roadmap SHA-256: `1798ad93b57ee002d6ba5454f03b439955175901bff1b6bd41c55a8c808fc3da`

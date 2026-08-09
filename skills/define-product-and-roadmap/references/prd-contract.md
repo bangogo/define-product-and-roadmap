@@ -3,136 +3,164 @@
 ## Contents
 
 1. Universal PRD structure
-2. Reference, reuse, requirements, and truth contracts
+2. Universal tables
 3. Product-shape contracts
-4. Risk contracts and approval readiness
+4. Risk contracts
+5. Approval readiness
 
 ## Universal PRD structure
 
-Use this complete product-facing order. The first four H2 headings carry these concepts in this sequence; place executive conclusions inside them instead of adding a preceding summary section:
+Use this complete product-facing order. Put executive conclusions inside the first four sections; do not add a preceding summary section.
 
-1. Metadata, product positioning, and goals.
-2. Target users and core problems.
-3. Current product shape, current effect, evidence, and value bottleneck.
-4. Product value and value loop.
-5. Reference products, existing assets, external services, and reuse strategy.
-6. Primary product experience or production contract.
-7. Product capability architecture and current priority.
-8. Product requirements and acceptance.
-9. Data, service, state, permission, quality, and recovery boundaries.
-10. Current-version scope and truth boundary.
-11. Success model, risks, non-goals, assumptions, status, and next gate.
+1. `产品定位与目标`: metadata, product promise, goal, non-goal, and current decision.
+2. `目标用户与核心问题`: product user, context, current workaround, unmet need, and priority.
+3. `当前产品形态、效果与核心缺口`: present state, evidence, shortest value path, truth boundary, and first bottleneck.
+4. `产品价值与价值循环`: user result, business result, repeated-use reason, evidence loop, and stop condition.
+5. `参考、复用与项目责任`: references, existing assets, external services, license/provenance, and project-owned additions.
+6. `主要体验或生产合同`: primary shape, material secondary shapes, states, and recovery.
+7. `产品能力与优先级`: lasting modules, responsibility, ownership, state, recovery, and priority rationale.
+8. `产品需求与验收`: stable requirements with product and technical acceptance boundaries.
+9. `数据、服务、状态、权限、质量与恢复边界`: cross-cutting contracts that materially affect value.
+10. `当前版本范围与真实性`: included/excluded scope and implementation truth.
+11. `成功、风险、假设与下一闸门`: measurement, risk controls, assumption register, status, reviewer, and next gate.
 
-Keep discovery notes, creator-intent analysis, route-pattern rationale, and discarded alternatives in working context. State conclusions in product language.
+A requested PRD means the full contract. Use a shorter brief only when the user explicitly asks for one. Keep discovery notes, route rationale, raw interviews, and rejected directions outside the formal PRD.
 
-A requested PRD means the full contract, including current evidence, references, selected shape tables, requirements, truth boundary, and assumptions. A shorter current-version brief applies only when the user explicitly asks for a brief or summary.
+## Universal tables
 
-## Universal contracts
+### Current effect
 
-### Reference and reuse
+| 观察对象 | 当前效果 | 证据状态 | 证据来源 | 当前缺口 |
+|---|---|---|---|---|
 
-Place references before the architecture they shape:
+Use only the canonical truth labels from the intent contract. State `尚未验证` rather than filling a gap with an inferred claim.
 
-| Source | Responsibility | Proven capability | Product mapping | Reuse decision | Project addition | User value | Evidence boundary |
-|---|---|---|---|---|---|---|---|
+### Reference, reuse, and project responsibility
 
-Use consistent modes:
+| 来源 | 版本/日期 | 许可状态 | 负责什么 | 已证实能力 | 产品映射 | 复用决策 | 项目补充 | 用户价值 | 证据边界 |
+|---|---|---|---|---|---|---|---|---|---|
+
+Use consistent decisions:
 
 - `「方法借鉴」`: apply a method while the project owns the resulting rules;
-- `「原样复用」`: retain a working product capability and build only the named connection;
+- `「原样复用」`: retain a working project capability and build only the named connection;
 - `「直接复用」`: call a pinned capability through a bounded adapter after source, version, license, interface, and exclusions are known;
 - `「参考复用」`: use structure, constraints, or fixtures as design and test input;
 - `「新建」`: own contract, implementation, tests, and maintenance.
 
-Map each module responsibility to one reuse decision and project-owned addition.
+Unknown license or source revision blocks `「直接复用」` but does not block `「方法借鉴」` when independently re-created and legally safe. Never infer a license from repository location, access, or project ownership; write `未声明` when evidence does not state it. Map each module responsibility to one reuse decision and one project-owned addition.
 
-### Capability and priority
+### Product capability
 
-Define lasting modules as `A「名称」`. For each module state responsibility, input, user-visible output, ownership, main states, recovery, and current priority reason. Put demo controllers, narration, reset tools, and approval decks inside current-version delivery support.
+Define lasting modules as `A「名称」`:
+
+| 产品模块 | 责任 | 输入 | 用户可见输出 | 负责人 | 主要状态 | 失败与恢复 | 当前优先级及依据 |
+|---|---|---|---|---|---|---|---|
+
+Do not present demo controllers, narration, reset tools, approval decks, database tables, or internal classes as product modules. Put them under current-version delivery support or the technical Spec.
 
 ### Requirements
 
-Use stable IDs and include both product and technical acceptance:
-
-| ID | Priority | Module | Product requirement | User-visible result | Business rule | Technical acceptance boundary | Evidence status |
+| 编号 | 优先级 | 模块 | 产品要求 | 用户可见结果 | 业务规则 | 技术验收边界 | 证据状态 |
 |---|---|---|---|---|---|---|---|
 
-Keep filenames, commands, schemas, fixtures, and mechanics in the active Spec unless they define a lasting public contract.
+Use unique IDs such as `P0-01「要求名称」`. Every requirement must map to a defined product module. Acceptance must describe observable state, contract, or artifact evidence; “功能完成” and “测试通过” are insufficient alone.
 
 ### Current-version truth
 
-| Surface | Current implementation | Truth status | User-visible label | Later replacement |
+| 层面 | 当前实现 | 真实性 | 用户可见标识 | 后续替换 |
 |---|---|---|---|---|
 
-Cover frontend or task surface, backend/process, data/input, model, external service, manual support, and output quality when applicable.
+Cover every applicable layer: frontend or task surface, backend/process, data/input, model, external service, manual support, output quality, and publication/transaction state.
+
+### Success model
+
+| 成功信号 | 对应用户价值 | 当前基线 | 本版判定 | 证据方法 | 结论状态 |
+|---|---|---|---|---|---|
+
+Use `未知，需建立基线` when evidence is absent. Label numeric targets as confirmed, evidence-supported, proposed, or pending validation. Do not invent thresholds.
+
+### Assumptions
+
+| 类型 | 假设或决策 | 状态 | 依据 | 对产品影响 | 确认人/下一步 |
+|---|---|---|---|---|---|
+
+Publish the same material rows in the Roadmap.
 
 ## Product-shape contracts
 
-Load the primary shape and any secondary shape that materially affects value delivery.
+Load the primary shape and only the secondary shapes that materially affect value delivery.
 
 ### C-end interaction
 
 Describe page inventory, information architecture, entry points, mobile/accessibility, and the core route:
 
-| Scene | Entry page | Page presentation | User action | State change | Visible result | Failure and recovery |
+| 场景 | 进入页面 | 页面呈现 | 用户动作 | 状态变化 | 可见结果 | 失败与恢复 |
 |---|---|---|---|---|---|---|
 
-Define loading, empty, error, permission, cancel, return, and repeated-use states where relevant. Use clickable journey evidence for version exits.
+Define loading, empty, error, permission, cancellation, return, repeated-use, and accessibility states where relevant. Use clickable route evidence for version exits; static screens alone prove only presentation.
 
 ### Content or artifact production
 
-Define the production contract:
-
-| Stage | Input | Processing responsibility | Intermediate or final artifact | Quality gate | Failure and recovery | Evidence |
+| 阶段 | 输入 | 处理责任 | 中间/最终产物 | 质量门 | 失败与恢复 | 证据 |
 |---|---|---|---|---|---|---|
 
 Include provenance, immutable revisions, human review, artifact usability, rework, and output separation. Measure quality, throughput, cycle time, and rework only after a baseline exists.
 
 ### Internal workflow
 
-| Role | Trigger | Processing steps | Handoff or approval | Visible result | Exception recovery | Audit evidence |
+| 角色 | 触发 | 处理步骤 | 交接/审批 | 可见结果 | 异常恢复 | 审计证据 |
 |---|---|---|---|---|---|---|
 
-Define ownership, queue state, permissions, escalation, and responsibility transfer. Describe UI only where it changes the operator task.
+Define ownership, queue state, permissions, escalation, responsibility transfer, and unknown outcomes. Describe UI only where it changes the operator task.
 
 ### API or platform
 
-| Consumer | Onboarding entry | First-success task | Interface or contract | Visible result | Failure recovery | Adoption evidence |
+| 使用者 | 接入入口 | 首次成功任务 | 接口/合同 | 可见结果 | 失败恢复 | 采用证据 |
 |---|---|---|---|---|---|---|
 
-Include examples, docs/SDK boundaries, credentials, compatibility, deprecation, self-service, reliability, and time to first value.
+Include examples, docs/SDK boundaries, credentials, compatibility, deprecation, self-service, reliability, and time to first value. An endpoint existing is not consumer first-success evidence.
 
 ### Service orchestration
 
-| Service scene | User touchpoint | Provider | Service action | State return | Failure recovery | Responsibility boundary |
+| 服务场景 | 用户触点 | 承接方 | 服务动作 | 状态回流 | 失败恢复 | 责任边界 |
 |---|---|---|---|---|---|---|
 
-Cover online/offline handoffs, provider truth, support, cancellation, unknown external outcomes, and return to the originating task.
+Cover online/offline handoffs, provider truth, support, cancellation, unknown external outcomes, reconciliation, and return to the originating task. A link without provider responsibility or return state is not a service outcome.
 
 ### Marketplace or transaction
 
-| Side | Discovery or match | Trust protection | Transaction action | Fulfillment result | Dispute recovery | Evidence |
+| 角色方 | 发现/匹配 | 信任保障 | 交易动作 | 履约结果 | 争议恢复 | 证据 |
 |---|---|---|---|---|---|---|
 
-Define both sides' value, supply/demand constraints, settlement, fraud, and dispute ownership.
+Define both sides' value, supply/demand constraints, identity and fraud controls, payment/settlement, fulfillment, cancellation, refund, and dispute ownership.
 
 ## Risk contracts
 
-### AI assistant or Agent
+When `风险修饰项` is not `无`, include one row per modifier:
 
-| Scene | Trigger entry | Carried context | Assistant response | Key question | Action boundary | Visible result | Fallback |
+| 风险修饰项 | 触发场景 | 潜在损害 | 预防控制 | 用户控制 | 失败/未知状态 | 审计证据 | 发布/审批门 |
 |---|---|---|---|---|---|---|---|
 
-Define model role, human control, uncertainty, feedback, correction, permissions, external actions, evaluation, and non-AI fallback. Keep runtime behavior separate from presenter narration.
+### AI
 
-### Evidence-sensitive or externally connected products
+Also include:
 
-Name sensitive data, consent, external write authority, service responsibility, truth labels, failure status, reconciliation, support, and audit. A successful local action does not prove the external outcome.
+| 场景 | 触发入口 | 携带上下文 | 助手响应 | 关键追问 | 行动边界 | 可见结果 | 回退 |
+|---|---|---|---|---|---|---|---|
 
-### Third-party reuse and publishing
+Define model role, human control, uncertainty, feedback, correction, permissions, evaluation, and non-AI fallback. A plausible answer, transcript, or successful invocation is not semantic or production proof.
 
-Record pinned source, version, license, callable boundary, exclusions, provenance, review, approval, publication authority, and current proof. Separate generation, review, approval, external operation, and release eligibility.
+### Sensitive data, external writes, publishing, transactions, and high-stakes decisions
+
+Name data class, consent, authority, confirmation point, idempotency or deduplication where relevant, external responsibility, unknown-result state, reconciliation, support, audit, reversal, and escalation. A successful local request does not prove the external outcome.
+
+### Third-party reuse
+
+Record pinned source, revision, license status, callable boundary, exclusions, provenance, update policy, adapter ownership, security review, and current proof. Repository HEAD movement does not prove the reused subdirectory changed.
 
 ## Approval readiness
 
-Publish the assumption register from the internal contract. Set `是否具备审批条件：否` when a `必须为真` item is not confirmed or has been denied. Approval of the PRD activates only the project-declared next gate.
+Use canonical document statuses: `Draft`, `Proposed`, `Review Candidate`, `Approved`, or `Superseded`.
+
+Set `是否具备审批条件：否（原因）` when any `必须为真` item is unresolved or denied, a high-risk external fact lacks authority, the selected direction is still mixed, or material current-state evidence conflicts. `Approved` requires `是否具备审批条件：是（已批准）` and an explicit approval record. Approval activates only the named next gate.
