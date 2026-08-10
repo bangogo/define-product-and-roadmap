@@ -1,63 +1,63 @@
-# Product Contract Quality Rubric
+# 产品契约质量评分表
 
-Use this rubric after deterministic validation. Score the exact PRD/Roadmap pair, not a summary of it.
+在确定性验证之后使用此评分表。对确切的 PRD/Roadmap 对评分,而非其摘要。
 
-## Decision rules
+## 评判规则
 
-- Score each dimension `0`, `1`, or `2` and cite document evidence.
-- `0`: missing, contradicted, or materially unsafe.
-- `1`: present but generic, incomplete, weakly evidenced, or inconsistent.
-- `2`: specific, evidence-bounded, internally consistent, and decision-usable.
-- Do not average away a gate failure.
-- A self-review is `performed`, not `independent`. A fresh-context review may be independent only if it did not receive the intended answer or hidden diagnosis.
+- 每个维度打 `0`、`1` 或 `2`,并引用文档证据。
+- `0`:缺失、矛盾或实质不安全。
+- `1`:存在但通用、不完整、证据薄弱或不一致。
+- `2`:具体、有证据边界、内部一致且可用于决策。
+- 不要用平均分掩盖闸门失败。
+- 自审是 `performed`(已执行),而非 `independent`(独立)。仅当全新上下文审查未收到预期答案或隐藏诊断时,它才可能是独立的。
 
-## Dimensions
+## 维度
 
-| Dimension | 0 | 1 | 2 |
+| 维度 | 0 | 1 | 2 |
 |---|---|---|---|
-| User and core task | User is missing or is actually the reviewer | User exists but task/context is generic | Product user, context, task, workaround, and priority are specific |
-| Current effect and evidence | Target is presented as current or source is absent | Current state is listed but evidence layer is vague | Current effects, sources, dates/revisions, truth labels, and limitations align |
-| Value path and bottleneck | Module list substitutes for value delivery | A route exists but the first weak transition is unclear | Shortest value path and first bottleneck explain current priority |
-| Product-shape fit | Generic interface/module template dominates | Primary shape is named but selected contracts are incomplete | Primary/secondary shapes fit the value surface and drive the right contracts |
-| Product value and business logic | Feature claims replace outcomes | Benefits are plausible but not linked into a loop | User result, business result, repeated-use reason, evidence loop, and stop condition connect |
-| Experience/production completeness | Happy path only | Main path plus some states or gates | Entry, states, visible result, failure, recovery, permissions, and review are complete for the shape |
-| Reuse and ownership | Reuse is asserted without boundary | Source or decision exists but ownership/license/version is incomplete | Source, revision, license, proof, decision, adapter, exclusions, and project addition are explicit |
-| Requirements and acceptance | Requirements are slogans or technical tasks | IDs and acceptance exist but are weakly observable | Unique requirements map to modules and observable product plus technical evidence |
-| Roadmap logic | Generic feature sequence or dates without evidence | Versions are named but questions/exits are weak | Each version follows the bottleneck, yields user value, answers one question, and activates one gate |
-| Truth, risk, and authority | Risk or authority is hidden; unsafe action implied | Risks are listed but controls/status are incomplete | Truth layers, modifiers, controls, unknown states, assumptions, readiness, and next authority are explicit |
-| Cross-document consistency | Material contradiction exists | Minor naming or scope drift exists | Metadata, modules, reuse, truth, assumptions, versions, and approval state align |
-| Readability and decision utility | Owners cannot find the decision | Complete but repetitive or overly technical | Business, product, experience, and technical owners can each locate their decision evidence |
+| 用户与核心任务 | 用户缺失,或其实是审阅人 | 用户存在但任务/场景通用 | 产品用户、场景、任务、替代方案与优先级都具体 |
+| 当前效果与证据 | 目标被呈现为当前,或来源缺失 | 列出现状但证据层面模糊 | 当前效果、来源、日期/版本、真值标签与局限相互对齐 |
+| 价值路径与瓶颈 | 用模块清单代替价值交付 | 有路线但第一个薄弱转折不清 | 最短价值路径与第一个瓶颈解释当前优先级 |
+| 产品形态匹配 | 通用界面/模块模板占主导 | 命名了主形态但所选契约不完整 | 主/次形态契合价值载体并驱动正确契约 |
+| 产品价值与业务逻辑 | 功能声明代替结果 | 收益合理但未连成循环 | 用户结果、业务结果、重复使用理由、证据回流与停止条件相连 |
+| 体验/生产完整性 | 仅快乐路径 | 主路径加部分状态或闸门 | 进入、状态、可见结果、失败、恢复、权限与审阅对该形态完整 |
+| 复用与归属 | 断言复用却无边界 | 有来源或决策但归属/许可/版本不全 | 来源、版本、许可、证据、决策、适配器、排除项与项目补充都明确 |
+| 需求与验收 | 需求是口号或技术任务 | 有 ID 与验收但可观察性弱 | 唯一需求映射到模块,且有可观察的产品与技术证据 |
+| Roadmap 逻辑 | 通用功能序列或无证据的日期 | 命名了版本但问题/退出薄弱 | 每个版本跟随瓶颈、产出用户价值、回答一个问题并激活一个闸门 |
+| 真值、风险与授权 | 风险或授权被隐藏;暗示不安全动作 | 列出风险但控制/状态不全 | 真值层面、修饰项、控制、未知状态、假设、条件与下一授权都明确 |
+| 跨文档一致性 | 存在实质性矛盾 | 存在轻微命名或范围漂移 | 元数据、模块、复用、真值、假设、版本与审批状态对齐 |
+| 可读性与决策效用 | 负责人找不到决策 | 完整但重复或过于技术 | 业务、产品、体验与技术负责人各自能定位其决策证据 |
 
-Maximum score: 24.
+最高分:24。
 
-## Approval blockers and quality-critical failures
+## 审批阻塞项与质量致命失败
 
-The pair is not approval-ready if any of these approval blockers applies:
+若以下任一审批阻塞项成立,该对文档不具备审批条件:
 
-1. Any unresolved or denied `必须为真` item exists.
-2. Current behavior is materially unsupported, contradictory, or mislabeled.
-3. Product user, primary value surface, or selected direction remains mixed.
-4. Sensitive data, external writes, publishing, transactions, or high-stakes decisions lack explicit authority and recovery.
-5. Direct third-party reuse lacks source revision or license status.
-6. PRD and Roadmap disagree on product shape, current version, truth, assumptions, or next gate.
-7. The current version lacks user-visible exit evidence.
+1. 存在任何未解决或被否决的 `必须为真` 项。
+2. 当前行为实质上无支撑、矛盾或误标。
+3. 产品用户、主价值载体或所选方向仍混乱。
+4. 敏感数据、外部写入、发布、交易或高风险决策缺乏明确授权与恢复。
+5. 直接第三方复用缺乏来源版本或许可状态。
+6. PRD 与 Roadmap 在产品形态、当前版本、真值、假设或下一闸门上不一致。
+7. 当前版本缺乏用户可见的退出证据。
 
-A well-written product contract may correctly remain not approval-ready. Do not lower semantic quality merely because an approval blocker is honestly recorded. Treat the following as quality-critical failures instead:
+一份写得好的产品契约可能正确地保持不具备审批条件。不要仅因为某个审批阻塞项被如实记录就降低语义质量。相反,把以下情况视为质量致命失败:
 
-1. A material approval blocker is hidden, mislabeled, or contradicted by readiness metadata.
-2. Current behavior is invented or promoted beyond its evidence layer.
-3. Sensitive data, external writes, publishing, transactions, or high-stakes decisions are authorized without explicit authority and recovery.
-4. PRD and Roadmap materially contradict each other.
-5. The selected route cannot be derived from the stated user value and bottleneck.
+1. 某个实质性审批阻塞项被隐藏、误标,或与审批条件元数据矛盾。
+2. 当前行为被虚构或越出其证据层面。
+3. 敏感数据、外部写入、发布、交易或高风险决策在无明确授权与恢复的情况下被授权。
+4. PRD 与 Roadmap 实质性互相矛盾。
+5. 所选路线无法从陈述的用户价值与瓶颈推导。
 
-## Result labels
+## 结果标签
 
-| Result | Rule |
+| 结果 | 规则 |
 |---|---|
-| `semantic_pass` | At least 20/24, no dimension below 1, no quality-critical failure, and every approval blocker is accurately reported |
-| `semantic_conditional` | At least 16/24 with no uncontained safety/authority failure, but quality or evidence handling remains materially incomplete |
-| `semantic_fail` | Below 16/24, any quality-critical failure, or a material contradiction |
-| `not_run` | Exact bytes were not reviewed |
-| `blocked` | Review could not run because required evidence or environment was unavailable |
+| `semantic_pass` | 至少 20/24,无维度低于 1,无质量致命失败,且每个审批阻塞项都被准确报告 |
+| `semantic_conditional` | 至少 16/24 且无未遏制的安全/授权失败,但质量或证据处理仍实质不完整 |
+| `semantic_fail` | 低于 16/24,或有任何质量致命失败,或有实质性矛盾 |
+| `not_run` | 未审查确切字节 |
+| `blocked` | 因缺少必需证据或环境,审查无法运行 |
 
-Report the score, result label, approval blockers, quality-critical failures, weakest dimensions, exact revisions reviewed, and review independence. Never convert `semantic_pass` into runtime proof, user validation, approval, or release authority.
+报告分数、结果标签、审批阻塞项、质量致命失败、最弱维度、所审查的确切版本与审查独立性。绝不要把 `semantic_pass` 转换为运行时证据、用户验证、审批或发布授权。

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for the product PRD/Roadmap contract validator."""
+"""产品 PRD/Roadmap 契约验证器的回归测试。"""
 
 from __future__ import annotations
 
@@ -321,7 +321,7 @@ class ContractTests(unittest.TestCase):
             make_roadmap("内容/产物生产", readiness=readiness).replace(ASSUMPTIONS, changed),
         )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("WARNING", result.stderr)
+        self.assertIn("警告", result.stderr)
 
     def test_assumption_mismatch_fails(self) -> None:
         roadmap = make_roadmap("内容/产物生产").replace("首版使用固定数据", "首版使用人工数据")
@@ -401,7 +401,7 @@ class ContractTests(unittest.TestCase):
         prd = make_prd("内容/产物生产").replace("帮助用户完成一项有价值的任务", "帮助用户完成 [待确认] 任务")
         result = self.run_validator(prd, make_roadmap("内容/产物生产"), "--allow-open-questions")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("WARNING", result.stderr)
+        self.assertIn("警告", result.stderr)
 
     def test_empty_required_table_fails(self) -> None:
         prd = make_prd("内容/产物生产").replace("| 完成主任务 | 获得可用结果 | 未知，需建立基线 | 完成并理解结果 | 任务观察 | 待验证 |", "")

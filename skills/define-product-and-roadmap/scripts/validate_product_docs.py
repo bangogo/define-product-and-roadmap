@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate evidence-backed, product-shape-aware PRD and Roadmap Markdown."""
+"""验证基于证据、感知产品形态的 PRD 与 Roadmap Markdown。"""
 
 from __future__ import annotations
 
@@ -94,7 +94,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--allow-open-questions",
         action="store_true",
-        help="Report TODO/TBD/[待确认] outside the assumption register as warnings instead of errors.",
+        help="将假设登记表之外的 TODO/TBD/[待确认] 作为警告而非错误报告。",
     )
     parser.add_argument("--format", choices=("text", "json"), default="text")
     return parser.parse_args()
@@ -657,14 +657,14 @@ def emit_result(
         )
     else:
         for warning in warnings:
-            print(f"WARNING: {warning}", file=sys.stderr)
+            print(f"警告:{warning}", file=sys.stderr)
         if errors:
             for error in errors:
-                print(f"ERROR: {error}", file=sys.stderr)
-            print(f"validation failed: {len(errors)} error(s), {len(warnings)} warning(s)", file=sys.stderr)
+                print(f"错误:{error}", file=sys.stderr)
+            print(f"验证失败:{len(errors)} 个错误,{len(warnings)} 个警告", file=sys.stderr)
         else:
-            print(f"validation passed: {prd_path} + {roadmap_path} ({len(warnings)} warning(s))")
-            print("proof boundary: structural and cross-document consistency only")
+            print(f"验证通过:{prd_path} + {roadmap_path}({len(warnings)} 个警告)")
+            print("证明边界(proof boundary):仅结构与跨文档一致性")
     return 1 if errors else 0
 
 

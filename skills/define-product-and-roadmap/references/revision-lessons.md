@@ -1,27 +1,27 @@
-# Revision Lessons
+# 修订经验
 
-Use each lesson as `symptom → target shape → repair action`.
+把每条经验当作 `症状 → 目标形态 → 修复动作`。
 
-| Symptom | Target shape | Repair action |
+| 症状 | 目标形态 | 修复动作 |
 |---|---|---|
-| Interface centrism: every product is described through homepage and clicks | Requirements follow the primary value surface | Classify the product; for artifact production move inputs, outputs, quality, provenance, review, and recovery to the center |
-| Workflow blindness: a C-end product is reduced to backend modules | Page, entry, route, state, and visible result form the contract | Map the current interface and complete user journeys before technical tasks |
-| Reviewer becomes the product user | Product user receives lasting value; reviewer decides the current gate | Place leadership or investor needs in delivery purpose and review evidence |
-| Future target is presented as current effect | Current behavior carries evidence status; target behavior carries a version | Build a current-effect snapshot and name real, test, simulated, manual, documented, or unverified states |
-| A single project template becomes a universal rule | Universal contract plus selected shape and risk contracts | Remove homepage, AI, R1, or fixed-table assumptions from global checks |
-| Full PRD request becomes an executive summary | A complete product contract carries current evidence, shape-specific experience, requirements, truth, and assumptions | Preserve the exact contract outline in chat and file outputs; offer a separate summary after the contract |
-| An existing document passes while a new chat proposal is unchecked | Validation applies to the exact bytes being delivered | Materialize chat proposals in a temporary directory and run the validator on those files |
-| Existing assets receive equal rebuild priority | Current investment follows the first value bottleneck | Mark working pages, Skills, data, or services as reuse dependencies and name only connection gaps |
-| Raw discovery and route rationale occupy the PRD | Formal documents present the selected product direction | Keep interview notes and discarded alternatives in working context |
-| Missing business choices are silently inferred | Assumptions carry type, status, evidence, impact, and confirmer | Ask one high-impact question or label a reversible proposal; keep unresolved must-be-true items not approval-ready |
-| Several directions are mixed into one vague product | One primary shape and selected direction organize the contract | Compare 2–3 alternatives, recommend one, and request confirmation |
-| Capability codes appear without meaning | Every code travels with its canonical name | Write `A0「能力」` and `R1（第 1 个体验版本）「名称」` at every decision point |
-| A validator reports success through keyword presence | Deterministic checks cover structure and alignment; fresh-context evaluation covers product judgment | Add shape-specific fixtures, negative cases, and blind forward tests |
-| Risk is hidden inside the secondary product shape | Product shape explains value delivery; risk modifiers explain control needs | Publish `风险修饰项` separately and load the matching risk contracts |
-| Roadmap repeats a generic frontend/backend/module sequence | Versions follow the first weak value transition | Define one primary validation question and user-visible exit evidence per version |
-| A command, HTTP 200, transcript, or fixture is treated as product proof | Every claim is bounded to its evidence layer | Separate structural pass, invocation, accepted artifact, semantic quality, runtime proof, and user evidence |
-| A third-party repository is listed as directly reusable without a pinned component | Reuse has a source, revision, license, callable boundary, exclusions, and adapter owner | Block direct reuse until the exact component is verified; method learning may remain possible |
-| PRD and Roadmap carry different assumptions or readiness | One product contract has one material assumption register and authority state | Publish the same material rows and validate them across both documents |
-| The document contains invented numeric precision | Targets distinguish baseline, confirmed commitment, proposal, and unknown | Use variables or `未知，需建立基线` until evidence supports a number |
-| A structurally valid table is empty or malformed | Required tables contain complete evidence-bearing rows | Validate row width, required row presence, unique IDs, canonical states, and cross-document alignment |
-| The current skill is edited without a reproducible release | One canonical source produces discoverable installs and a checksum package | Version the source, test exact bytes, build the archive, verify extraction, and record the release evidence |
+| 界面中心主义:每个产品都通过首页和点击来描述 | 需求跟随主价值载体 | 分类产品;对产物生产,把输入、产出、质量、来源、审阅与恢复放到中心 |
+| 工作流盲区:一个 C 端产品被简化为后端模块 | 页面、入口、路线、状态与可见结果构成契约 | 在技术任务之前,先映射当前界面并补全用户旅程 |
+| 审阅人变成了产品用户 | 产品用户获得持久价值;审阅人决定当前闸门 | 把领导或投资人的需求放进交付目的与审阅证据 |
+| 未来目标被呈现为当前效果 | 当前行为带证据状态;目标行为带版本 | 建立当前效果快照,并命名真实、测试接入、模拟、人工承接、仅有文档或未验证状态 |
+| 单个项目模板变成通用规则 | 通用契约加所选形态与风险契约 | 从全局检查中移除首页、AI、R1 或固定表格假设 |
+| 完整 PRD 请求变成执行摘要 | 一份完整产品契约带当前证据、形态专属体验、需求、真值与假设 | 在会话与文件输出中保留确切的契约大纲;契约之后再单独提供摘要 |
+| 已有文档通过,而新的会话提案未被检查 | 验证针对正在交付的确切字节 | 把会话提案落到临时目录,并对这些文件运行验证器 |
+| 已有资产获得同等重建优先级 | 当前投入跟随第一个价值瓶颈 | 把可工作的页面、Skill、数据或服务标记为复用依赖,只指出连接缺口 |
+| 原始发现与路线依据占据 PRD | 正式文档呈现所选的产品方向 | 把访谈笔记与被否决的备选保留在工作上下文 |
+| 缺失的业务选择被默默推断 | 假设带类型、状态、证据、影响与确认人 | 问一个高影响问题,或标注一个可逆提案;让未解决的必须为真项保持不具备审批条件 |
+| 多个方向被混进一个模糊产品 | 一个主形态与所选方向组织契约 | 对比 2–3 个备选,推荐一个,并请求确认 |
+| 能力编码出现时没有含义 | 每个编码都带其规范名称 | 在每个决策点写出 `A0「能力」` 与 `R1（第 1 个体验版本）「名称」` |
+| 验证器凭关键词出现就报告成功 | 确定性检查覆盖结构与对齐;全新上下文评估覆盖产品判断 | 增加形态专属 fixture、负例与盲测转发 |
+| 风险被藏在次级产品形态里 | 产品形态解释价值交付;风险修饰项解释控制需求 | 单独发布 `风险修饰项` 并加载匹配的风险契约 |
+| Roadmap 重复通用的前端/后端/模块序列 | 版本跟随第一个薄弱的价值转折 | 每个版本定义一个主要验证问题与用户可见的退出证据 |
+| 命令、HTTP 200、transcript 或 fixture 被当作产品证据 | 每条陈述都被限定在其证据层面 | 分清结构通过、调用、接受产物、语义质量、运行时证据与用户证据 |
+| 第三方仓库被列为可直接复用,却没有固定组件 | 复用有来源、版本、许可、可调用边界、排除项与适配器归属 | 在确切组件被验证前阻断直接复用;方法借鉴可保留 |
+| PRD 与 Roadmap 带不同假设或审批条件 | 一份产品契约有一份物质性假设登记与授权状态 | 发布相同的物质性行,并在两份文档间验证 |
+| 文档包含编造的数字精度 | 目标区分基线、已确认承诺、提案与未知 | 在证据支持一个数字前,使用变量或 `未知，需建立基线` |
+| 一个结构上有效的表格是空的或畸形的 | 必需的表格包含完整的、带证据的行 | 验证行宽、必需行存在、唯一 ID、规范状态与跨文档对齐 |
+| 当前技能被编辑却没有可复现的发布 | 一个规范源产出可发现的安装与带校验和的包 | 对源做版本化,测试确切字节,构建归档,验证解压,并记录发布证据 |

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a deterministic Agent Skills ZIP and SHA-256 checksum."""
+"""构建确定性的 Agent Skills ZIP 与 SHA-256 校验和。"""
 
 from __future__ import annotations
 

@@ -1,148 +1,148 @@
-# Experience Roadmap Contract
+# 体验路线图契约
 
-## Contents
+## 目录
 
-1. Roadmap structure and capability language
-2. Route selection by value surface
-3. Version and evidence rules
-4. Current-version and governance contracts
-5. Acceptance
+1. Roadmap 结构与能力语言
+2. 按价值载体选择路线
+3. 版本与证据规则
+4. 当前版本与治理契约
+5. 验收
 
-## Roadmap structure and capability language
+## Roadmap 结构与能力语言
 
-Publish in this order:
+按以下顺序发布:
 
-1. `核心用户任务与演进目标`.
-2. `当前基线、价值瓶颈与能力优先级`.
-3. `产品能力层级`.
-4. `体验版本路线图`.
-5. `当前版本交付与真实性`.
-6. `依赖、风险、假设与版本闸门`.
+1. `核心用户任务与演进目标`。
+2. `当前基线、价值瓶颈与能力优先级`。
+3. `产品能力层级`。
+4. `体验版本路线图`。
+5. `当前版本交付与真实性`。
+6. `依赖、风险、假设与版本闸门`。
 
-Use:
+使用:
 
-| Code | Meaning |
+| 编码 | 含义 |
 |---|---|
-| `A「模块」` | Lasting product module |
-| `A0「能力」` | Named maturity level inside module A |
-| `R1（第 1 个体验版本）「名称」` | First experience version |
+| `A「模块」` | 持久产品模块 |
+| `A0「能力」` | 模块 A 内具名的成熟度等级 |
+| `R1（第 1 个体验版本）「名称」` | 第一个体验版本 |
 
-Repeat code and name together at every decision point. A capability defines responsibility, input, user-visible output, ownership boundary, and exit evidence. Define each module's maturity levels:
+在每个决策点把编码与名称一起重复。一个能力定义责任、输入、用户可见输出、归属边界与退出证据。定义每个模块的成熟度等级:
 
-Assign a different uppercase letter to every module. Capability codes inherit that letter: `A「采集」` may contain `A0「手工采集」`, while a separate `B「审阅」` module uses `B0「人工审阅」`. Do not reuse `A` for several differently named modules. Gate identifiers such as `G1` are not capability codes and may be named independently.
+给每个模块分配不同的大写字母。能力编码继承该字母:`A「采集」` 可包含 `A0「手工采集」`,而另一个独立的 `B「审阅」` 模块用 `B0「人工审阅」`。不要把 `A` 复用于多个不同名称的模块。闸门标识如 `G1` 不是能力编码,可独立命名。
 
 | 产品模块 | L0 | L1 | L2 |
 |---|---|---|---|
 
-Do not assign every module the same level progression. Each level must represent an observable improvement for its own responsibility.
+不要给每个模块分配相同的等级递进。每个等级必须代表其自身责任上可观察的改进。
 
-## Route selection by value surface
+## 按价值载体选择路线
 
-Derive the route from the first missing or weak transition, not from a default module order.
+从第一个缺失或薄弱的转折推导路线,而非从默认模块顺序。
 
-### Consumer interface
+### C 端交互产品
 
-Sequence a usable route through entry, comprehension, action, state change, visible result, and recovery. Establish a standalone screen version only when the screen itself settles a meaningful product decision; otherwise keep an end-to-end clickable path.
+把一条可用路线串起来:进入、理解、行动、状态变化、可见结果与恢复。仅当某个页面本身能解决一个有意义的产品决策时,才建立独立的页面版本;否则保持端到端可点击路径。
 
-### Content or artifact production
+### 内容或产物生产
 
-Let a module stand alone when its output is independently usable, retainable, comparable, and acceptable. A valid pattern is:
+当某个模块的产出可独立使用、可保留、可比较且可验收时,让它独立成版。一个有效模式是:
 
 ```text
-reference baselines → independent module upgrades → integration → recovery → history/reuse
+参考基线 → 独立模块升级 → 集成 → 恢复 → 历史/复用
 ```
 
-Baseline evidence does not approve production reuse. Integration preserves independent artifact contracts and provenance.
+基线证据不批准生产复用。集成保留独立的产物契约与来源。
 
-### Internal workflow
+### 内部流程工具
 
-Sequence one real work item through trigger, processing, handoff/approval, outcome, exception, and audit. Prefer one end-to-end queue item over separate frontend/backend milestones.
+把一个真实工作项串起来:触发、处理、交接/审批、结果、异常与审计。优先一个端到端队列项,而非分离的前端/后端里程碑。
 
-### API or platform
+### API 或平台
 
-Sequence discoverability, onboarding, first success, repeatable integration, self-service, reliability, and adoption. Exit versions with a consumer-owned successful use, not only an implemented endpoint.
+把可发现性、入门、首次成功、可重复集成、自助、可靠性与采用串起来。版本以使用者拥有的成功使用退出,而非仅一个已实现的端点。
 
-### Service orchestration
+### 服务编排
 
-Sequence entry, provider handoff, result or status return, failure recovery, additional service cases, and real integration. A link without provider responsibility or return state is not a service outcome.
+把进入、承接方交接、结果或状态返回、失败恢复、更多服务场景与真实集成串起来。一个没有承接方责任或返回状态的链接不是服务结果。
 
-### Marketplace
+### 交易/市场
 
-Sequence one protected exchange across both sides before expanding liquidity, matching depth, automation, or monetization.
+在扩展流动性、匹配深度、自动化或变现之前,先完成一次双方受保护的交易。
 
-### Decision demo
+### 决策演示
 
-Use a bounded demo when the immediate purpose is investment or leadership alignment. Label fixed data, simulated services, manual setup, and presenter aids. The demo must still show the product user's task; reviewer narration remains delivery support.
+当直接目的是投资或管理层对齐时,使用有界演示。标注固定数据、模拟服务、人工准备与演示辅助。演示仍须展示产品用户的任务;审阅人的讲解仍是交付支持。
 
-## Version and evidence rules
+## 版本与证据规则
 
-Use this table:
+使用此表:
 
 | 体验版本 | 用户任务 | 核心能力 | 用户可见结果 | 本版主要增量 | 主要验证问题 | 进入条件 | 退出条件 | 状态 |
 |---|---|---|---|---|---|---|---|---|
 
-Use `R0「当前基线」` only for observed or documented current state. Number planned versions contiguously from R1. Use canonical status values: `已有`, `Proposed`, `Ready`, `In Progress`, `Blocked`, `Complete`, or `Superseded`.
+`R0「当前基线」` 仅用于已观察或有文档记载的当前状态。计划版本从 R1 起连续编号。使用规范状态值:`已有`、`Proposed`、`Ready`、`In Progress`、`Blocked`、`Complete` 或 `Superseded`。
 
-For every nonzero version:
+对每个非零版本:
 
-1. Describe one complete and meaningful user experience sentence.
-2. Validate one primary decision-changing question.
-3. Preserve accepted paths and artifacts as regression baselines.
-4. Carry working assets as reuse dependencies until a named gap justifies change.
-5. Replace one or a small number of truth boundaries.
-6. Put frontend, backend, data, model, interface, integration, and test work below the experience version.
-7. State evidence-bearing entry and exit conditions.
-8. Name the gate activated by exit evidence.
-9. Keep scale and monetization as directions until pilot evidence supports a bounded version.
+1. 描述一句完整且有意义的用户体验。
+2. 验证一个会改变决策的主要问题。
+3. 把已接受的路线与产物保留为回归基线。
+4. 把可工作的资产作为复用依赖携带,直到某个具名缺口证明需要改动。
+5. 替换一个或少数真值边界。
+6. 把前端、后端、数据、模型、接口、集成与测试工作放在体验版本之下。
+7. 声明带证据的进入与退出条件。
+8. 指明退出证据激活的闸门。
+9. 在试点证据支持一个有界版本前,把规模化与变现作为方向。
 
-Shape-specific exit evidence:
+形态专属的退出证据:
 
-| Product shape | Version exit evidence |
+| 产品形态 | 版本退出证据 |
 |---|---|
-| C-end interaction | Clickable route, state and recovery evidence, comprehension or task evidence |
-| Content/artifact production | Usable artifact, quality result, provenance, review, and replay evidence |
-| Internal workflow | Completed work item, handoff/approval, exception, and audit evidence |
-| API/platform | New consumer first success, contract checks, reliability, and onboarding evidence |
-| Service orchestration | Provider handoff, visible result/status, return, responsibility, and recovery evidence |
-| Marketplace | Both-side completion, trust, fulfillment/settlement, and dispute evidence |
+| C 端交互产品 | 可点击路线、状态与恢复证据、理解或任务证据 |
+| 内容/产物生产 | 可用产物、质量结果、来源、审阅与重放证据 |
+| 内部流程工具 | 完成的工作项、交接/审批、异常与审计证据 |
+| API/平台 | 新使用者首次成功、契约检查、可靠性与入门证据 |
+| 服务编排 | 承接方交接、可见结果/状态、返回、责任与恢复证据 |
+| 交易/市场 | 双方完成、信任、履约/结算与争议证据 |
 
-Do not mark a version `Complete` from task completion, exit code, HTTP response, or document approval alone. Require the version's declared user-visible result and exit evidence.
+不要仅凭任务完成、退出码、HTTP 响应或文档批准就把版本标记为 `Complete`。要求该版本声明了用户可见结果与退出证据。
 
-## Current-version and governance contracts
+## 当前版本与治理契约
 
-Show the active or proposed current version's exact deliverable:
+展示当前活跃或提议版本的确切交付物:
 
 | 交付项 | 用户可见结果 | 当前实现 | 真实性 | 验收证据 | 不包含 |
 |---|---|---|---|---|---|
 
-Include only surfaces relevant to the selected product shape. State real, test, simulated, manual, documented, observed, historical, and unverified behavior where used.
+仅包含与所选产品形态相关的界面。在使用点声明真实、测试接入、模拟、人工承接、仅有文档、已观察、历史与未验证行为。
 
-Publish the same material assumption rows as the PRD:
+发布与 PRD 相同的物质性假设行:
 
 | 类型 | 假设或决策 | 状态 | 依据 | 对产品影响 | 确认人/下一步 |
 |---|---|---|---|---|---|
 
-State dependencies and gates:
+声明依赖与闸门:
 
 | 闸门 | 所需证据 | 决策人 | 通过后授权 | 未通过处理 |
 |---|---|---|---|---|
 
-Keep the following states distinct:
+保持以下状态相互区分:
 
-- document state: Draft, Proposed, Review Candidate, Approved, or Superseded;
-- version state: 已有, Proposed, Ready, In Progress, Blocked, Complete, or Superseded;
-- runtime truth: real, test, simulated, manual, documented, observed, historical, or unverified;
-- external-operation state: not attempted, pending, confirmed, failed, or unknown;
-- approval readiness: ready or not ready for the named gate.
+- 文档状态:Draft、Proposed、Review Candidate、Approved 或 Superseded;
+- 版本状态:已有、Proposed、Ready、In Progress、Blocked、Complete 或 Superseded;
+- 运行时真值:真实、测试接入、模拟、人工承接、仅有文档、已观察、历史或未验证;
+- 外部操作状态:未尝试、进行中、已确认、失败或未知;
+- 审批条件:对所指明的闸门已具备或未具备。
 
-## Acceptance
+## 验收
 
-1. The Roadmap opens with the product user's task and current evidence baseline.
-2. The route follows the primary value surface and the first value bottleneck.
-3. Every code is named at its point of use.
-4. Every version produces shape-appropriate evidence and answers one primary question.
-5. Existing working assets remain reuse dependencies until a named uncertainty activates work.
-6. Later versions preserve accepted user routes or artifact contracts.
-7. Reviewers, demo aids, and technical tasks remain below product versions.
-8. PRD and Roadmap share metadata, terminology, scope, reuse decisions, truth, assumptions, and authority status.
-9. The current version states user-visible deliverables, exclusions, evidence, and the exact next gate.
+1. Roadmap 以产品用户的任务与当前证据基线开篇。
+2. 路线跟随主价值载体与第一个价值瓶颈。
+3. 每个编码在使用点带名称。
+4. 每个版本产出形态匹配的证据,并回答一个主要问题。
+5. 已有的可工作资产保持为复用依赖,直到某个具名不确定性激活工作。
+6. 后续版本保留已接受的用户路线或产物契约。
+7. 审阅人、演示辅助与技术任务保持在产品版本之下。
+8. PRD 与 Roadmap 共享元数据、术语、范围、复用决策、真值、假设与授权状态。
+9. 当前版本声明用户可见交付物、排除项、证据与确切的下一闸门。

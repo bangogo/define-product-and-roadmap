@@ -1,82 +1,82 @@
-# Define Product and Roadmap Skill v2.0.0 Audit
+# Define Product and Roadmap 技能 v2.0.0 审计
 
-## Conclusion
+## 结论
 
-The imported Skill already had a useful product-first core and a deterministic validator, but it was not yet reliable enough to treat as a portable, versioned audit product. Version 2.0.0 closes the largest gaps: evidence provenance, runtime truth, product shape, risk modifiers, authority, approval readiness, exact-byte validation, semantic scoring, project discovery, packaging, and release evidence.
+导入的技能已具备有用的“产品优先”内核与一个确定性验证器,但尚不足以作为一个可移植、有版本的审计产品来依赖。v2.0.0 关闭了最大的缺口:证据来源、运行时真值、产品形态、风险修饰项、授权、审批条件、精确字节验证、语义评分、项目发现、打包与发布证据。
 
-The release is suitable for project-local Codex use and portable Agent Skills distribution. Claude Code discovery is proven, but Claude-side execution is conditional because the tested local Claude host did not expose file or shell tools. No test here proves a real product, user outcome, implementation, publication, or approval.
+本次发布适合项目本地的 Codex 使用与可移植 Agent Skills 分发。Claude Code 的发现已证明,但 Claude 侧执行是有条件的,因为被测的本地 Claude host 未暴露文件或 shell 工具。这里的任何测试都不证明一个真实产品、用户结果、实现、发布或审批。
 
-## Scope and sources
+## 范围与来源
 
-The audit covered the complete original directory at `/Users/helloban/.codex/skills/define-product-and-roadmap`, the migrated project package, its scripts, fixtures, generated artifacts, and live host invocations. The original directory was preserved unchanged. Its imported bytes are recorded in `docs/baseline-source-sha256.txt`, Git commit `dc5a8c0`, and tag `v1.0.0-imported`.
+审计覆盖 `/Users/helloban/.codex/skills/define-product-and-roadmap` 的完整原始目录、迁移后的项目包、其脚本、fixture、生成的产物,以及 host 实时调用。原始目录保持不变。其导入字节记录在 `docs/baseline-source-sha256.txt`、Git 提交 `dc5a8c0` 与标签 `v1.0.0-imported`。
 
-The design was checked against current first-party or specification-owner guidance:
+设计对照了当前第一方或规范拥有者的指引:
 
-- [OpenAI: Build skills](https://developers.openai.com/plugins/build/skills)
-- [OpenAI: Build skills in ChatGPT](https://learn.chatgpt.com/docs/build-skills)
-- [Agent Skills specification](https://agentskills.io/specification)
-- [Claude Code: Extend Claude with skills](https://code.claude.com/docs/en/skills)
+- [OpenAI:Build skills](https://developers.openai.com/plugins/build/skills)
+- [OpenAI:Build skills in ChatGPT](https://learn.chatgpt.com/docs/build-skills)
+- [Agent Skills 规范](https://agentskills.io/specification)
+- [Claude Code:用 skills 扩展 Claude](https://code.claude.com/docs/en/skills)
 
-Applied guidance includes a required `SKILL.md`, minimal portable frontmatter, trigger-oriented descriptions, progressive loading, deterministic scripts for repeatable work, project-local discovery, relative references, fresh-session evaluation, and explicit separation between discovery and execution.
+采用的指引包括:必需的 `SKILL.md`、最小可移植 frontmatter、面向触发的 description、渐进式加载、用于可重复工作的确定性脚本、项目本地发现、相对引用、全新会话评估,以及发现与执行之间的显式分离。
 
-## Capability status
+## 能力状态
 
-| Surface | Mentioned | Declared | Available | Executed | Accepted result |
+| 载体 | 已提及 | 已声明 | 可用 | 已执行 | 接受的结果 |
 |---|---|---|---|---|---|
-| Canonical package | Yes | `SKILL.md` + `VERSION` | `skills/define-product-and-roadmap` | Structural and package checks | Yes, v2.0.0 source |
-| Codex project Skill | Yes | `.agents/skills` + `agents/openai.yaml` | Symlink resolves to canonical source | Three valid project-path invocations plus one invalid same-name run excluded | Yes, generation and audit evidence |
-| Claude Code project Skill | Yes | `.claude/skills` | Symlink resolves and Claude reports the exact directory | Discovery executed; document audit blocked by missing local tools | Discovery only; no accepted audit artifact |
-| Other Agent Skills host | Yes | Standard `name` and `description`, relative resources and scripts | Portable ZIP | No unnamed third-party host was executed | Conditional portability only |
+| 规范包 | 是 | `SKILL.md` + `VERSION` | `skills/define-product-and-roadmap` | 结构与包检查 | 是,v2.0.0 源 |
+| Codex 项目技能 | 是 | `.agents/skills` + `agents/openai.yaml` | 符号链接解析到规范源 | 三次有效的项目路径调用,加一次无效同名运行被排除 | 是,生成与审计证据 |
+| Claude Code 项目技能 | 是 | `.claude/skills` | 符号链接解析,Claude 报告确切目录 | 发现已执行;文档审计被缺失的本地工具阻塞 | 仅发现;无接受的审计产物 |
+| 其他 Agent Skills host | 是 | 标准 `name` 与 `description`,相对资源与脚本 | 可移植 ZIP | 未执行任何未具名第三方 host | 仅条件性可移植 |
 
-## Baseline assessment
+## 基线评估
 
-### What was already strong
+### 已有的优势
 
-- Product value and current effect came before implementation planning.
-- PRD and Roadmap were treated as one aligned contract.
-- Product shape influenced requirements instead of forcing one interface template.
-- A Python validator and 20 regression cases already existed.
-- Historical plans and target behavior were explicitly distinguished from current proof.
+- 产品价值与当前效果先于实现规划。
+- PRD 与 Roadmap 被当作一个对齐的契约。
+- 产品形态影响需求,而非强加单一界面模板。
+- 已存在一个 Python 验证器与 20 个回归用例。
+- 历史计划与目标行为被显式区别于当前证据。
 
-### Material gaps found
+### 发现的实质性缺口
 
-| Gap | Risk | v2 repair |
+| 缺口 | 风险 | v2 修复 |
 |---|---|---|
-| No packaged version or immutable baseline | Changes could not be reproduced or rolled back cleanly | Git baseline commit/tag, semantic versions, changelog, deterministic ZIP and checksum |
-| No project-local multi-host layout | Users could copy divergent Skill trees | One canonical source with `.agents` and `.claude` symlinks |
-| Evidence source and runtime truth could be conflated | A document statement could be presented as real behavior | Separate evidence ledger classifications from canonical truth states |
-| AI and external operations were easy to model as product shapes | Risk controls and product value could become mixed | Independent risk modifiers and matching control contracts |
-| Audit/create/rewrite authority was implicit | Audit-only work could mutate files; approval could be over-read | Explicit operation modes, mutation limits, and next-gate authority |
-| Structural success could sound like product proof | False confidence in runtime or user value | Machine-readable proof boundary plus 12-dimension semantic rubric |
-| Module and capability naming was under-specified | One letter could refer to multiple modules | Distinct module letters, aligned capability prefixes, cross-document checks |
-| Whole-document capability regex produced false positives | `G1` gates could be rejected as capability codes | Scope capability checks to hierarchy and version capability cells |
-| Reuse/license wording could be inferred | Unknown legal or version state could be overstated | Pinned revision/license fields and mandatory `未声明` when unknown |
-| No forward-test corpus or host evidence | Unit tests alone could be mistaken for usefulness | Trigger inventory, three shapes of semantic fixtures, live generation and audit runs |
+| 无打包版本或不可变基线 | 变更无法被复现或干净回滚 | Git 基线提交/标签、语义版本、变更记录、确定性 ZIP 与校验和 |
+| 无项目本地多 host 布局 | 用户可能复制分叉的技能树 | 一个规范源加 `.agents` 与 `.claude` 符号链接 |
+| 证据来源与运行时真值可能被混淆 | 一条文档陈述可能被呈现为真实行为 | 把证据台账分类与规范真值状态分开 |
+| AI 与外部操作容易被建模为产品形态 | 风险控制与产品价值可能混合 | 独立的风险修饰项与匹配的控制契约 |
+| 审计/创建/重写授权是隐式的 | 仅审计工作可能改动文件;审批可能被过度解读 | 显式操作模式、改动限制与下一闸门授权 |
+| 结构成功可能听起来像产品证据 | 对运行时或用户价值的虚假信心 | 机器可读的证明边界加 12 维语义评分表 |
+| 模块与能力命名不够规范 | 一个字母可能指向多个模块 | 独立模块字母、对齐的能力前缀、跨文档检查 |
+| 全文能力正则产生误报 | `G1` 闸门可能被当作能力编码拒绝 | 把能力检查限定在层级与版本能力单元格 |
+| 复用/许可措辞可能被推断 | 未知的法律或版本状态可能被夸大 | 固定版本/许可字段,未知时强制 `未声明` |
+| 无前向测试语料或 host 证据 | 仅单元测试可能被误认为有用 | 触发清单、三种形态的语义 fixture、实时生成与审计运行 |
 
-## v2 product contract
+## v2 产品契约
 
-The Skill now distinguishes four operations (`audit only`, `create`, `rewrite`, `align`), six primary product shapes, up to two secondary shapes, seven risk modifiers, seven evidence stages, six delivery purposes, five document states, seven version states, eight truth states, and four assumption types.
+该技能现在区分四种操作(`audit only`、`create`、`rewrite`、`align`)、六类主产品形态、最多两个次级形态、七个风险修饰项、七个证据阶段、六个交付目的、五个文档状态、七个版本状态、八个真值状态与四个假设类型。
 
-The PRD and Roadmap publish the same version, evidence cutoff, shape, risk, lifecycle, purpose, applicable contracts, readiness, modules, assumptions, and next authority. The validator checks those structures and alignments; the semantic rubric separately judges evidence quality and product usefulness across 12 dimensions.
+PRD 与 Roadmap 发布相同的版本、证据截止、形态、风险、生命周期、目的、适用契约、条件、模块、假设与下一授权。验证器检查这些结构与对齐;语义评分表单独在 12 个维度上判断证据质量与产品有用性。
 
-## Effectiveness evidence
+## 有效性证据
 
-- A C-end fixture produced aligned documents and passed exact-byte validation while retaining an unresolved assumption warning.
-- A content/artifact fixture initially failed with 41 actionable errors, repaired itself from validator diagnostics, then passed with one honest approval warning and self-scored `20/24 semantic_pass`.
-- A fresh-context audit of the accepted content/artifact pair passed structurally and scored `22/24 semantic_pass`; the weakest dimensions were current evidence and reuse ownership.
-- An intentionally bad audit-only pair was not edited, failed with 49 structural errors, and was correctly judged `0/24 semantic_fail`. The review identified target-as-current promotion, product-shape conflict, and a technical-task roadmap.
-- A regression test created after the live run proves `G1` gate identifiers are no longer false capability positives.
+- 一个 C 端 fixture 产出对齐的文档并通过精确字节验证,同时保留一个未解决假设的警告。
+- 一个内容/产物 fixture 初始失败(41 个可操作错误),从验证器诊断自我修复,然后带一个诚实的审批警告通过,自评 `20/24 semantic_pass`。
+- 对接受的内容/产物对的全新上下文审计结构上通过,得分 `22/24 semantic_pass`;最弱维度是当前证据与复用归属。
+- 一个故意做坏的仅审计对未被编辑,以 49 个结构错误失败,并被正确判定为 `0/24 semantic_fail`。审查识别出目标冒充当前、产品形态冲突与技术任务充作 Roadmap。
+- 实时运行后创建的回归测试证明 `G1` 闸门标识不再是能力的误报。
 
-These results show useful generation, self-repair, and rejection behavior. They remain document-level evidence, not product runtime or user evidence.
+这些结果显示有用的生成、自我修复与拒绝行为。它们仍是文档级证据,而非产品运行时或用户证据。
 
-## Remaining limits and release judgment
+## 剩余局限与发布判断
 
-1. Deterministic validation checks structure and cross-document consistency, not whether source claims are true or whether the product direction is good.
-2. Semantic reviews are model judgments. The recorded reviewers labeled themselves self-review, not independent, even when invoked in a fresh context.
-3. The live fixtures are synthetic and bounded. No real project stakeholder approved their product decisions.
-4. The local Codex default model could not run because Codex CLI 0.142.5 was rejected as too old for that model; successful runs used `gpt-5.4`. This is an environment issue, not a Skill pass.
-5. Same-name user and project Skills can create ambiguous host selection. Exact-path invocation and loaded-path reporting are required for acceptance tests.
-6. Claude Code loaded the correct project directory but the local non-interactive host exposed no local read/shell tools. Claude execution is therefore `blocked_environment`, not passed.
-7. Other Agent Skills-compatible hosts are package-compatible by structure; their runtime behavior remains unexecuted until tested in that host.
+1. 确定性验证检查结构与跨文档一致性,不检查来源陈述是否为真或产品方向是否良好。
+2. 语义审查是模型判断。记录的审查者把自己标注为自审而非独立,即使在全新上下文调用。
+3. 实时 fixture 是合成的、有界的。没有真实项目干系人批准其产品决策。
+4. 本地 Codex 默认模型无法运行,因为 Codex CLI 0.142.5 被判定对该模型过旧;成功的运行使用 `gpt-5.4`。这是环境问题,不是技能通过。
+5. 同名用户与项目技能可能造成 host 选择歧义。验收测试要求精确路径调用与已加载路径报告。
+6. Claude Code 加载了正确的项目目录,但本地非交互 host 未暴露本地读/shell 工具。因此 Claude 执行是 `blocked_environment`,而非通过。
+7. 其他 Agent Skills 兼容 host 在结构上包兼容;其运行时行为在未于该 host 测试前仍未执行。
 
-Release judgment: `v2.0.0` is accepted for versioned project-local use and portable distribution, with Claude runtime and unnamed-host runtime explicitly conditional. It is not evidence that any downstream PRD is approved or any product is built.
+发布判断:`v2.0.0` 被接受用于有版本的项目本地使用与可移植分发,Claude 运行时与未具名 host 运行时显式为条件性。它不证明任何下游 PRD 被批准或任何产品被构建。

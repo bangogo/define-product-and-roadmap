@@ -1,36 +1,36 @@
 ---
 name: define-product-and-roadmap
-description: Create, audit, rewrite, or align evidence-backed product PRDs and experience Roadmaps. Use for 产品需求文档, PRD, 产品价值, 产品形态, 当前效果, 用户路径, 内容或产物生产, 内部工作流, API/平台, 服务编排, marketplace, AI 助手, MVP, 体验版本, 复用决策, 风险边界, 假设确认, or approval readiness. Do not use for a standalone engineering task list, technical architecture, marketing plan, or implementation-only review unless the user also needs a product contract.
+description: 创建、审计、重写或对齐基于真实证据的产品 PRD 与体验路线图(Roadmap)。适用于 产品需求文档、PRD、产品价值、产品形态、当前效果、用户路径、内容或产物生产、内部工作流、API/平台、服务编排、marketplace、AI 助手、MVP、体验版本、复用决策、风险边界、假设确认、审批条件评估。Do not use(不要用于)单纯的工程任务清单、技术架构、营销计划或仅限实现的评审,除非用户同时需要一份产品契约。
 ---
 
-# Define Product and Roadmap
+# 定义产品与路线图
 
-Create one readable product contract that states who receives value, what the product currently proves, where the first value bottleneck sits, and which evidence unlocks the next version.
+创建一份可读的产品契约:说清楚谁获得价值、产品当前能证明什么、第一个价值瓶颈在哪里、哪个证据能解锁下一个版本。
 
-## Load only the needed resources
+## 按需加载资源
 
-1. Always read [references/intent-and-scenario-contract.md](references/intent-and-scenario-contract.md) before classifying the product or asking questions.
-2. Read [references/prd-contract.md](references/prd-contract.md) for PRD creation, audit, or rewrite.
-3. Read [references/roadmap-contract.md](references/roadmap-contract.md) for Roadmap creation, audit, or rewrite.
-4. Read [references/revision-lessons.md](references/revision-lessons.md) when auditing, revising, or incorporating feedback.
-5. Read [references/quality-rubric.md](references/quality-rubric.md) before the final semantic review.
-6. Use [assets/prd-template.md](assets/prd-template.md) and [assets/roadmap-template.md](assets/roadmap-template.md) only when creating new files or repairing a document whose structure is unusable.
+1. 在分类产品或提问之前,务必先读 [references/intent-and-scenario-contract.md](references/intent-and-scenario-contract.md)。
+2. 创建、审计或重写 PRD 时,读 [references/prd-contract.md](references/prd-contract.md)。
+3. 创建、审计或重写 Roadmap 时,读 [references/roadmap-contract.md](references/roadmap-contract.md)。
+4. 审计、修订或采纳反馈时,读 [references/revision-lessons.md](references/revision-lessons.md)。
+5. 最终语义审查前,读 [references/quality-rubric.md](references/quality-rubric.md)。
+6. 仅在创建新文件或修复结构已不可用的文档时,才使用 [assets/prd-template.md](assets/prd-template.md) 与 [assets/roadmap-template.md](assets/roadmap-template.md)。
 
-## 1. Establish scope and authority
+## 1. 确定范围与权限
 
-Identify the requested operation: `audit only`, `create`, `rewrite`, or `align`. Identify whether the user needs a PRD, a Roadmap, or an aligned pair, and whether the delivery target is a file or chat Markdown.
+确定请求的操作:`audit only`(仅审计)、`create`(创建)、`rewrite`(重写)或 `align`(对齐)。确定用户需要 PRD、Roadmap 还是对齐的一对,以及交付目标是文件还是会话内 Markdown。
 
-Do not edit files during an audit-only request. Treat approval of a document as permission only for the named next gate; it does not authorize implementation, publication, account access, or external writes.
+仅审计(audit-only)请求期间不要编辑文件。把“批准某份文档”视为仅授权进入所指明的下一个闸门;它不授权实现、发布、账户访问或外部写入。
 
-## 2. Read authoritative evidence
+## 2. 阅读权威证据
 
-Read the smallest relevant evidence set in this order:
+按以下顺序阅读最小相关证据集:
 
-`approved product contract → accepted decisions → current runtime or artifact evidence → current research → historical material`
+`已批准产品契约 → 已接受决策 → 当前运行时或产物证据 → 当前研究 → 历史材料`
 
-Inspect current README, formal product documents, accepted ADRs or decisions, research, archives, and relevant runtime or artifacts before drafting. Resolve discoverable facts before asking the user. Preserve unrelated changes.
+在起草前,检查当前 README、正式产品文档、已接受的 ADR 或决策、研究、归档,以及相关运行时或产物。先从可发现的事实解决,再向用户提问。保留无关变更。
 
-Classify every material statement as one of:
+把每条实质性陈述归类为以下之一:
 
 - `已确认决策`
 - `已观察证据`
@@ -39,73 +39,73 @@ Classify every material statement as one of:
 - `建议假设，待确认`
 - `待调研`
 
-Record source, date or revision when available, and conflicts. Never turn a target, plan, fixture, successful command, or historical claim into current product proof.
+记录来源、日期或版本(如有)以及冲突。绝不把目标、计划、fixture、成功命令或历史声明当作当前产品证据。
 
-## 3. Build the private product brief
+## 3. 构建内部产品简报
 
-Record the current user and core task, value surface, current result, shortest value path, first weak transition, existing foundation, truth boundary, evidence gaps, delivery purpose, reviewer, requested decision, and next gate.
+记录:当前用户与核心任务、价值载体、当前结果、最短价值路径、第一个弱转折、已有基础、真值边界、证据缺口、交付目的、审阅人、请求的决策、下一闸门。
 
-Use truth labels at the point of use: `真实`, `测试接入`, `模拟`, `人工承接`, `仅有文档`, `已观察`, `尚未验证`, or `历史证据`.
+在使用点标注真值标签:`真实`、`测试接入`、`模拟`、`人工承接`、`仅有文档`、`已观察`、`尚未验证`、`历史证据`。
 
-Keep the product user distinct from the reviewer, operator, buyer, approver, and technical owner.
+把“产品用户”与审阅人、操作人、买方、审批人、技术负责人区分开。
 
-## 4. Classify product shape and risk
+## 4. 分类产品形态与风险
 
-Follow [references/intent-and-scenario-contract.md](references/intent-and-scenario-contract.md):
+遵循 [references/intent-and-scenario-contract.md](references/intent-and-scenario-contract.md):
 
-1. Select exactly one primary product shape.
-2. Select no more than two secondary product shapes.
-3. Record risk modifiers separately; do not disguise AI or external-write risk as a secondary product shape.
-4. Name the current delivery purpose.
-5. Derive priority from the first missing or weak transition in the value path.
+1. 选择唯一一个主产品形态。
+2. 选择不超过两个次级产品形态。
+3. 单独记录风险修饰项;不要把 AI 或外部写入风险伪装成次级形态。
+4. 指明当前交付目的。
+5. 从价值路径中第一个缺失或薄弱的转折推导优先级。
 
-## 5. Close only decision-changing unknowns
+## 5. 只关闭会改变决策的未知项
 
-Ask one question at a time only when the answer changes the product user, primary value surface, delivery purpose, value bottleneck, route order, truth boundary, or approval readiness. State the evidence, recommended interpretation, question, and consequence of each direction.
+仅当答案会改变产品用户、主价值载体、交付目的、价值瓶颈、路线顺序、真值边界或审批条件时,才一次问一个问题。说明每条方向的证据、建议解读、问题与后果。
 
-When two or more materially different directions remain credible, compare 2–3 alternatives on user value, business value, feasibility, differentiation, and evidence strength. Recommend one and ask for confirmation.
+当两个或以上实质不同的方向都仍可信时,在用户价值、业务价值、可行性、差异化和证据强度上对比 2–3 个备选方案。推荐一个并请求确认。
 
-Record assumptions as `必须为真`, `重要假设`, `可逆默认`, or `高风险外部事实`, with status `已确认`, `建议假设，待确认`, `待调研`, or `已否决`. Do not block on wording or implementation detail. If a non-blocking answer is unavailable, use a clearly labeled reversible default. An unresolved or denied `必须为真` item keeps the document `Proposed / Not approval-ready`.
+把假设记录为 `必须为真`、`重要假设`、`可逆默认` 或 `高风险外部事实`,状态为 `已确认`、`建议假设，待确认`、`待调研` 或 `已否决`。不要在措辞或实现细节上阻塞。若非阻塞性答案不可得,使用清晰标注的可逆默认值。一个未解决或被否决的 `必须为真` 项,使文档保持 `Proposed / Not approval-ready`。
 
-## 6. Draft the selected contracts
+## 6. 起草所选契约
 
-Combine the universal contract, the primary-shape contract, materially relevant secondary-shape contracts, and every applicable risk contract.
+合并:通用契约 + 主形态契约 + 实质相关的次级形态契约 + 每个适用的风险契约。
 
-For a PRD, follow [references/prd-contract.md](references/prd-contract.md). Make the first four H2 sections:
+PRD 遵循 [references/prd-contract.md](references/prd-contract.md)。前四个 H2 章节为:
 
 `产品定位与目标 → 目标用户与核心问题 → 当前产品形态、效果与核心缺口 → 产品价值与价值循环`
 
-For a Roadmap, follow [references/roadmap-contract.md](references/roadmap-contract.md). Make the first two H2 sections:
+Roadmap 遵循 [references/roadmap-contract.md](references/roadmap-contract.md)。前两个 H2 章节为:
 
 `核心用户任务与演进目标 → 当前基线、价值瓶颈与能力优先级`
 
-Use identical metadata, canonical names, reuse decisions, truth states, assumptions, version status, and approval status across the pair. Give every lasting module a distinct uppercase letter and keep its capability prefix aligned: `A「模块」` owns `A0「能力」`, while the next module uses `B「模块」` and `B0「能力」`. Write requirement and version codes with names at the point of use: `P0-01「要求」` and `R1（第 1 个体验版本）「版本」`.
+在一对文档间使用一致的元数据、规范名称、复用决策、真值状态、假设、版本状态与审批状态。给每个持久模块一个独立的大写字母,并保持其能力前缀对齐:`A「模块」` 拥有 `A0「能力」`,下一个模块用 `B「模块」` 与 `B0「能力」`。在使用点带名称写出需求与版本编码:`P0-01「要求」` 与 `R1（第 1 个体验版本）「版本」`。
 
-Keep evidence provenance separate from runtime truth. The private evidence ledger uses `已确认决策`, `已观察证据`, or `文档记载`; published `证据状态` and `真实性` cells use only `真实`, `测试接入`, `模拟`, `人工承接`, `仅有文档`, `已观察`, `尚未验证`, or `历史证据`.
+把证据来源与运行时真值分开。内部证据台账用 `已确认决策`、`已观察证据` 或 `文档记载`;发布的 `证据状态` 与 `真实性` 单元格只用 `真实`、`测试接入`、`模拟`、`人工承接`、`仅有文档`、`已观察`、`尚未验证` 或 `历史证据`。
 
-Preserve independently useful production modules as standalone versions. Use thin end-to-end versions when value exists only through a complete journey. Keep filenames, internal classes, commands, and implementation sequencing in the active technical Spec unless they define a lasting public contract.
+把可独立使用的生产模块保留为独立版本。当价值只通过完整旅程才存在时,使用端到端的薄版本。把文件名、内部类、命令和实现顺序放入当前技术 Spec,除非它们定义了持久的公开契约。
 
-## 7. Validate the exact deliverable
+## 7. 验证确切的交付物
 
-Run the deterministic validator against the exact bytes being delivered:
+对确切要交付的字节运行确定性验证器:
 
 ```bash
-python3 <skill-directory>/scripts/validate_product_docs.py \
-  --prd <prd-path> \
-  --roadmap <roadmap-path>
+python3 <技能目录>/scripts/validate_product_docs.py \
+  --prd <prd 路径> \
+  --roadmap <roadmap 路径>
 ```
 
-Run the validator before reading its source. The contracts and templates define the format; use validator diagnostics to repair the document. Read or patch validator source only when a diagnostic is incorrect, unclear, or the user is maintaining this Skill.
+先运行验证器,再读它的源码。契约与模板定义格式;用验证器诊断来修复文档。仅当某条诊断不正确、不清楚,或用户在维护本技能时,才读或修补验证器源码。
 
-If only one document was requested, create a temporary counterpart that states the same metadata and contract, validate the pair, and discard only the temporary file. For chat delivery, materialize the proposed Markdown in a temporary directory and validate those exact bytes.
+若只请求了一份文档,创建一个声明相同元数据与契约的临时配对文档,验证这对,然后仅删除临时文件。对于会话内交付,把提议的 Markdown 落到临时目录并验证那些确切字节。
 
-Fix every error and review warnings. Then apply [references/quality-rubric.md](references/quality-rubric.md) to the exact deliverable. For substantial documents, report the 12-dimension total, semantic result label, approval blockers, weakest dimensions, and whether the review was self-review or independent. A validator pass proves structural consistency only; it does not prove product judgment, runtime behavior, research truth, user value, or approval.
+修复每个错误,审阅每个警告。然后对确切交付物应用 [references/quality-rubric.md](references/quality-rubric.md)。对于实质性文档,报告 12 维总分、语义结果标签、审批阻塞项、最弱维度,以及该审查是自审还是独立审查。验证器通过仅证明结构一致性;它不证明产品判断、运行时行为、研究真值、用户价值或审批。
 
-For substantial work, use fresh-context review on the target product and one unlike product shape when the environment supports it. Pass raw evidence and the user request, not the intended answer. Label unrun, blocked, and conditional evaluation honestly.
+对于实质性工作,当环境支持时,对目标产品与一个不同形态的产品使用全新上下文审查。传入原始证据与用户请求,而不是预期答案。如实标注未运行、被阻塞或条件性评估。
 
-## Published metadata
+## 发布元数据
 
-Use these fields in both documents:
+两份文档都使用这些字段:
 
 - `文档版本`
 - `证据截止日期`
@@ -118,28 +118,28 @@ Use these fields in both documents:
 - `文档状态`
 - `是否具备审批条件`
 
-Write `文档版本` as full semantic versioning such as `1.2.0` or `v1.2.0`, never `v1.2`.
+`文档版本` 写成完整语义版本,如 `1.2.0` 或 `v1.2.0`,绝不写 `v1.2`。
 
-## Hard boundaries
+## 硬边界
 
-| Boundary | Required handling |
+| 边界 | 必须的处理 |
 |---|---|
-| Product facts | Cite traceable evidence or label assumption, status, impact, and owner |
-| Capability truth | Label real, test, simulated, manual, documented, observed, historical, and unverified behavior where used |
-| Sensitive data and external writes | Obtain explicit authority before real accounts, uploads, submissions, transactions, or publication |
-| Reuse | Record source, pinned revision, license status, callable boundary, exclusions, and project-owned adapter; use `未声明` instead of inferring a license |
-| Delivery authority | State the exact next gate; never convert document approval into Build or release authority |
-| Validation claims | Separate structural pass, semantic review, runtime proof, user evidence, and external-operation state |
+| 产品事实 | 引用可追溯证据,或标注假设、状态、影响与负责人 |
+| 能力真值 | 在使用点标注真实、测试接入、模拟、人工承接、仅有文档、已观察、历史与未验证行为 |
+| 敏感数据与外部写入 | 在真实账户、上传、提交、交易或发布前获得明确授权 |
+| 复用 | 记录来源、固定版本、许可状态、可调用边界、排除项与项目自有适配器;用 `未声明` 而非推断许可 |
+| 交付授权 | 指明确切的下一闸门;绝不把文档批准转换为 Build 或发布授权 |
+| 验证声明 | 分清结构通过、语义审查、运行时证据、用户证据与外部操作状态 |
 
-## Finish only when
+## 仅当以下条件满足时才结束
 
-Business, product, experience, and technical owners can each answer:
+业务、产品、体验与技术负责人各自能回答:
 
-1. Who receives value, where, and why the product matters.
-2. What works now, what evidence proves it, and where the first bottleneck sits.
-3. Which product-shape and risk contracts apply and why.
-4. What is reused, adapted, newly built, simulated, manual, or unverified.
-5. How the primary journey or production task succeeds and recovers.
-6. Why the Roadmap order follows value evidence instead of a generic module sequence.
-7. Which assumptions remain and whether the documents are approval-ready.
-8. What exact evidence exits the current version and which named gate it activates.
+1. 谁获得价值、在哪里、为什么这款产品重要。
+2. 现在什么能用、什么证据证明它、第一个瓶颈在哪里。
+3. 哪些产品形态与风险契约适用,以及为什么。
+4. 什么被复用、改造、新建、模拟、人工承接或未验证。
+5. 主旅程或生产任务如何成功并恢复。
+6. 为什么 Roadmap 顺序跟随价值证据,而非通用模块序列。
+7. 还剩哪些假设,文档是否已具备审批条件。
+8. 哪个确切的证据退出当前版本、激活哪个具名闸门。

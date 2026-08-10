@@ -1,81 +1,81 @@
-# Evidence, Product Shape, and Clarification Contract
+# 证据、产品形态与澄清契约
 
-## Contents
+## 目录
 
-1. Operation and authority
-2. Evidence and current-effect snapshot
-3. Product-shape classification
-4. Risk modifiers and delivery purpose
-5. Question and divergence workflow
-6. Assumption register and completion gate
+1. 操作与权限
+2. 证据与当前效果快照
+3. 产品形态分类
+4. 风险修饰项与交付目的
+5. 提问与分歧工作流
+6. 假设登记与完成闸门
 
-## Operation and authority
+## 操作与权限
 
-Classify the requested operation before changing files:
+在改动文件之前,先分类请求的操作:
 
-| Operation | Allowed result | Default mutation rule |
+| 操作 | 允许的结果 | 默认改动规则 |
 |---|---|---|
-| Audit only | Findings, evidence, severity, and repair proposal | Do not edit product documents |
-| Create | New PRD, Roadmap, or aligned pair | Create only requested deliverables |
-| Rewrite | Replacement document plus material-change summary | Preserve originals through version control or a new path |
-| Align | Reconcile an existing PRD/Roadmap pair and current-state entrypoint | Touch only required files; preserve project authority |
+| 仅审计 | 发现、证据、严重度与修复提案 | 不编辑产品文档 |
+| 创建 | 新 PRD、Roadmap 或对齐的一对 | 只创建请求的交付物 |
+| 重写 | 替换文档加实质性变更摘要 | 通过版本控制或新路径保留原件 |
+| 对齐 | 调和已有 PRD/Roadmap 对与当前状态入口 | 只触碰必需文件;保留项目授权 |
 
-Record the reviewer, requested decision, and exact next gate. A product contract can authorize only that gate. It cannot silently authorize Build, publication, live accounts, sensitive-data use, transactions, or external writes.
+记录审阅人、请求的决策与确切的下一闸门。一份产品契约只能授权那个闸门。它不能默示授权 Build、发布、线上账户、敏感数据使用、交易或外部写入。
 
-## Evidence and current-effect snapshot
+## 证据与当前效果快照
 
-Build this private brief before drafting:
+起草前构建这份内部简报:
 
-| Field | Required result |
+| 字段 | 必需结果 |
 |---|---|
-| Product user | Person or team receiving lasting product value |
-| Core task | Recognizable job the product user needs to complete |
-| Current effect | What the product currently lets the user do or receive |
-| Value surface | Where the benefit becomes visible or usable |
-| Value path | Shortest route from trigger or input to meaningful result |
-| Value bottleneck | First missing or weak transition that blocks the result |
-| Existing foundation | Working pages, artifacts, data, interfaces, services, Skills, or processes |
-| Truth boundary | Frontend, backend, data, model, external service, manual, permission, and output state |
-| Delivery purpose | Decision demo, user-value validation, production improvement, integration validation, real pilot, or scale |
-| Review gate | Reviewer, requested decision, and next gate activated |
+| 产品用户 | 获得持久产品价值的人或团队 |
+| 核心任务 | 产品用户需要完成的、可识别的工作 |
+| 当前效果 | 产品当前让用户做到或得到什么 |
+| 价值载体 | 收益在哪里变得可见或可用 |
+| 价值路径 | 从触发或输入到有意义结果的最短路线 |
+| 价值瓶颈 | 阻挡结果的第一个缺失或薄弱转折 |
+| 已有基础 | 可工作的页面、产物、数据、接口、服务、Skill 或流程 |
+| 真值边界 | 前端、后端、数据、模型、外部服务、人工、权限与产出状态 |
+| 交付目的 | 决策演示、用户价值验证、生产改进、集成验证、真实试点或规模化 |
+| 审阅闸门 | 审阅人、请求的决策与激活的下一闸门 |
 
-Maintain a compact evidence ledger for every material conclusion:
+为每条实质性结论维护一份紧凑的证据台账:
 
-| Claim or observation | Classification | Source | Date/revision | Confidence | Conflict or limitation |
+| 陈述或观察 | 分类 | 来源 | 日期/版本 | 置信度 | 冲突或局限 |
 |---|---|---|---|---|---|
 
-Use these classifications:
+使用这些分类:
 
-- `已确认决策`: explicitly approved and still authoritative;
-- `已观察证据`: directly inspected current behavior or artifact;
-- `文档记载`: stated by a current document but not independently observed;
-- `历史证据`: useful precedent that may be stale;
-- `建议假设，待确认`: reversible or material proposal awaiting a decision;
-- `待调研`: external or project fact that cannot safely be inferred.
+- `已确认决策`:已显式批准且仍具权威;
+- `已观察证据`:直接检查到的当前行为或产物;
+- `文档记载`:由当前文档陈述但未经独立观察;
+- `历史证据`:可能有用的先例,但可能过时;
+- `建议假设，待确认`:等待决策的可逆或物质性提案;
+- `待调研`:无法安全推断的外部或项目事实。
 
-When sources conflict, prefer the higher-authority and newer source only after confirming it still governs the same scope. Publish the conflict if it changes the product direction or approval readiness.
+当来源冲突时,仅在确认更高权威、更新的来源仍治理相同范围后,才优先采用它。若冲突改变产品方向或审批条件,发布该冲突。
 
-Use this current-effect table in the PRD:
+在 PRD 中使用这张当前效果表:
 
 | 观察对象 | 当前效果 | 证据状态 | 证据来源 | 当前缺口 |
 |---|---|---|---|---|
 
-The ledger classifications above describe where a claim came from. They are not runtime truth states. In the published current-effect table, the column named `证据状态` uses only the canonical truth states `真实`, `测试接入`, `模拟`, `人工承接`, `仅有文档`, `已观察`, `尚未验证`, and `历史证据`. The same set applies to every published `真实性` cell. A target becomes current only after evidence exists at the declared level. A command exit code, HTTP 200, fixture, transcript, or document statement proves only its own layer.
+上面的台账分类描述一条陈述从何而来。它们不是运行时真值状态。在发布的当前效果表中,名为 `证据状态` 的列只用规范真值状态 `真实`、`测试接入`、`模拟`、`人工承接`、`仅有文档`、`已观察`、`尚未验证`、`历史证据`。同一组标签适用于每个发布的 `真实性` 单元格。一个目标只有在声明级别有证据后才变为当前。命令退出码、HTTP 200、fixture、transcript 或文档陈述只证明其自身层面。
 
-## Product-shape classification
+## 产品形态分类
 
-Classify through six dimensions:
+通过六个维度分类:
 
-| Dimension | Choices and test |
+| 维度 | 选项与判据 |
 |---|---|
-| Primary beneficiary | Consumer, business user, internal operator, creator, developer, buyer/seller, or service staff |
-| Primary value surface | Consumer interface, content/artifact production, internal workflow, API/platform, service orchestration, marketplace, or physical/hybrid |
-| Evidence stage | Idea, static design, interactive prototype, test integration, limited real use, or live/scale |
-| Delivery purpose | Decision demo, user-value validation, production improvement, integration validation, real pilot, or scale |
-| Value bottleneck | Comprehension, activation, task completion, artifact quality, throughput, reliability, adoption, handoff, trust, or cost |
-| Risk modifier | AI, sensitive data, external write, third-party reuse/license, publishing, transaction, or high-stakes decision |
+| 主要受益人 | 消费者、业务用户、内部操作人、创作者、开发者、买/卖方或服务人员 |
+| 主价值载体 | 消费者界面、内容/产物生产、内部工作流、API/平台、服务编排、交易市场或物理/混合 |
+| 证据阶段 | 想法、静态设计、交互原型、测试接入、有限真实使用、线上/规模化 |
+| 交付目的 | 决策演示、用户价值验证、生产改进、集成验证、真实试点、规模化 |
+| 价值瓶颈 | 理解、激活、任务完成、产物质量、吞吐、可靠性、采用、交接、信任或成本 |
+| 风险修饰项 | AI、敏感数据、外部写入、第三方复用/许可、发布、交易、高风险决策 |
 
-Select exactly one primary shape from:
+从以下选择唯一一个主形态:
 
 - `C端交互产品`
 - `内容/产物生产`
@@ -84,26 +84,26 @@ Select exactly one primary shape from:
 - `服务编排`
 - `交易/市场`
 
-Select no more than two secondary shapes from the same list. For a hybrid product, name the primary value surface rather than labeling every surface equally. Put AI and risk conditions in `风险修饰项`, not `次级形态`.
+从同一清单选择不超过两个次级形态。对混合产品,指明主价值载体,而非把每个载体都同等标注。把 AI 与风险条件放进 `风险修饰项`,而非 `次级形态`。
 
-### Shape-specific observation lenses
+### 形态专属观察视角
 
-| Product shape | Inspect first | Meaningful result |
+| 产品形态 | 首先观察 | 有意义的结果 |
 |---|---|---|
-| C-end interaction | Page inventory, entry points, information hierarchy, user route, state transitions, mobile/accessibility | User completes a task and understands the result |
-| Content/artifact production | Input contract, stages, intermediate/final artifacts, quality, provenance, review, recovery | User receives a usable and reviewable artifact |
-| Internal workflow | Roles, trigger, queue, decisions, approval, handoff, exception, audit | Operator completes a real work item |
-| API/platform | Consumer, onboarding, first success, contract, examples, self-service, compatibility, reliability | A new consumer reaches first successful use |
-| Service orchestration | Touchpoints, providers, responsibility, online/offline handoff, return and support | User receives the service outcome, not only a link |
-| Marketplace | Both sides, discovery, match, trust, transaction, fulfillment, settlement, dispute | Both sides complete a protected exchange |
+| C 端交互 | 页面清单、入口、信息层级、用户路线、状态转移、移动端/可访问性 | 用户完成一个任务并理解结果 |
+| 内容/产物生产 | 输入契约、阶段、中间/最终产物、质量、来源、审阅、恢复 | 用户获得一个可用且可审阅的产物 |
+| 内部工作流 | 角色、触发、队列、决策、审批、交接、异常、审计 | 操作人完成一个真实工作项 |
+| API/平台 | 使用者、入门、首次成功、契约、示例、自助、兼容性、可靠性 | 一个新使用者达到首次成功使用 |
+| 服务编排 | 触点、承接方、责任、线上/线下交接、返回与支持 | 用户获得服务结果,而非仅一个链接 |
+| 交易市场 | 双方、发现、匹配、信任、交易、履约、结算、争议 | 双方完成一次受保护的交易 |
 
-## Risk modifiers and delivery purpose
+## 风险修饰项与交付目的
 
-Publish zero or more canonical modifiers: `AI`, `敏感数据`, `外部写入`, `第三方复用`, `发布`, `交易`, or `高风险决策`. Use `无` only after checking each modifier.
+发布零个或多个规范修饰项:`AI`、`敏感数据`、`外部写入`、`第三方复用`、`发布`、`交易`、`高风险决策`。仅在逐项检查后才能使用 `无`。
 
-An AI assistant or Agent is normally a modifier, not a primary shape. Inspect its trigger, context, role, control, action boundary, output, uncertainty, feedback, fallback, and evaluation. A transaction can be both the primary marketplace surface and a risk modifier.
+一个 AI 助手或 Agent 通常是修饰项,而非主形态。检查其触发、上下文、角色、控制、行动边界、输出、不确定性、反馈、回退与评估。交易可以既是主市场载体,又是风险修饰项。
 
-Use these canonical delivery purposes:
+使用这些规范交付目的:
 
 - `决策演示`
 - `用户价值验证`
@@ -112,57 +112,57 @@ Use these canonical delivery purposes:
 - `真实试点`
 - `规模化`
 
-Keep four roles separate:
+保持四个角色相互区分:
 
-| Role | Complete task | Evidence produced |
+| 角色 | 完成任务 | 产出的证据 |
 |---|---|---|
-| Product user | Receives the lasting product value | Task, outcome, quality, or behavior evidence |
-| Reviewer | Decides investment or the next delivery gate | Approval record and bounded next action |
-| Operator | Performs manual or operational work | Handoff, audit, or support evidence |
-| Technical owner | Delivers and maintains the declared boundary | Interface, state, recovery, and verification evidence |
+| 产品用户 | 获得持久产品价值 | 任务、结果、质量或行为证据 |
+| 审阅人 | 决定投资或下一交付闸门 | 审批记录与有界的下一动作 |
+| 操作人 | 执行人工或运营工作 | 交接、审计或支持证据 |
+| 技术负责人 | 交付并维护声明边界 | 接口、状态、恢复与验证证据 |
 
-Derive priority by asking:
+按以下问题推导优先级:
 
-1. Which user result matters most?
-2. Where does that result become visible or usable?
-3. Which parts already work and should remain reuse dependencies?
-4. Which first transition prevents the result today?
-5. Which evidence would change the next investment decision?
+1. 哪个用户结果最重要?
+2. 那个结果在哪里变得可见或可用?
+3. 哪些部分已经在工作,应保持为复用依赖?
+4. 今天哪个第一转折阻挡了结果?
+5. 哪个证据会改变下一个投资决策?
 
-## Question and divergence workflow
+## 提问与分歧工作流
 
-Resolve project facts from evidence. Ask only when an answer changes user, value surface, delivery purpose, primary bottleneck, route order, fidelity, truth boundary, or acceptance.
+从证据解决项目事实。仅当答案改变用户、价值载体、交付目的、主瓶颈、路线顺序、保真度、真值边界或验收时才提问。
 
-Use one question at a time:
+一次只问一个问题:
 
 ```text
-Evidence: what the project currently shows.
-Recommended interpretation: the direction most consistent with the evidence.
-Question: one high-impact choice.
-Impact: what changes under each answer.
+证据:项目当前展示什么。
+建议解读:与证据最一致的方向。
+问题:一个高影响选择。
+影响:每个答案下什么会改变。
 ```
 
-When several directions remain credible, compare 2–3 alternatives:
+当多个方向都仍可信时,对比 2–3 个备选:
 
-| Direction | User value | Business value | Feasibility | Differentiation | Evidence strength | Recommendation |
+| 方向 | 用户价值 | 业务价值 | 可行性 | 差异化 | 证据强度 | 推荐 |
 |---|---|---|---|---|---|---|
 
-Select a direction before publishing the formal contract. Preserve only the chosen direction, remaining assumptions, and open decisions in the PRD/Roadmap. Keep raw dialogue and rejected options in working context unless the user requests a decision log.
+在发布正式契约前选定一个方向。在 PRD/Roadmap 中只保留所选方向、剩余假设与开放决策。原始对话与被否决选项保留在工作上下文,除非用户要求决策日志。
 
-## Assumption register and completion gate
+## 假设登记与完成闸门
 
-Publish the same material assumptions in both documents:
+在两份文档中发布相同的物质性假设:
 
 | 类型 | 假设或决策 | 状态 | 依据 | 对产品影响 | 确认人/下一步 |
 |---|---|---|---|---|---|
 
-Canonical types:
+规范类型:
 
-- `必须为真`: the chosen product direction fails if false;
-- `重要假设`: materially changes scope or value but allows a draft;
-- `可逆默认`: low-risk choice that can be changed later;
-- `高风险外部事实`: requires research or authority rather than inference.
+- `必须为真`:若为假,所选产品方向失败;
+- `重要假设`:实质改变范围或价值,但允许起草;
+- `可逆默认`:低风险、可后续更改的选择;
+- `高风险外部事实`:需要研究或授权,而非推断。
 
-Canonical statuses: `已确认`, `建议假设，待确认`, `待调研`, or `已否决`.
+规范状态:`已确认`、`建议假设，待确认`、`待调研`、`已否决`。
 
-Only confirmed items may appear as product facts. Any unresolved or denied `必须为真` item makes the document `Proposed / Not approval-ready`. Stop questioning when the user, value surface, current effect, delivery purpose, bottleneck, primary route, truth boundary, and next gate are stable; defer implementation detail to the active technical Spec.
+只有已确认项可作为产品事实出现。任何未解决或被否决的 `必须为真` 项,使文档保持 `Proposed / Not approval-ready`。当用户、价值载体、当前效果、交付目的、瓶颈、主路线、真值边界与下一闸门都稳定时停止提问;把实现细节推迟到当前技术 Spec。
