@@ -1,0 +1,83 @@
+# Claude Code audit-only execution evidence
+
+- Date: 2026-08-10
+- Host: Claude Code (model claude-fable-5)
+- Operation: audit only (no file edits)
+- Skill loaded: `.claude/skills/define-product-and-roadmap` (project discovery, symlink to canonical source)
+- Targets:
+  - PRD: `evals/fixtures/audit-only/product-requirements.md`
+  - Roadmap: `evals/fixtures/audit-only/product-roadmap.md`
+- Reviewer independence: self-review performed, not independent
+- Proof boundary: structural consistency + semantic self-review only. Not runtime proof, user evidence, or approval.
+
+## Execution chain proven in this host
+
+1. Skill discovery: project `.claude/skills/define-product-and-roadmap` loaded via Skill invocation.
+2. Read: both fixture files and the needed contract references were read.
+3. Bash: the deterministic validator `validate_product_docs.py` ran against the exact fixture bytes.
+4. Audit-only behavior: no fixture file was modified (sha256 unchanged before/after, see below).
+5. Semantic review: the 12-dimension rubric was applied to the exact bytes.
+
+This upgrades the prior Claude Code status from “Blocked (host exposed no Read/Bash)” to “Executed”.
+
+## Structural validation
+
+- Result: `validation failed: 49 error(s), 0 warning(s)`
+- Error classes:
+  - Missing required metadata (16): each document lacks 8 of the 10 canonical metadata fields (文档版本, 证据截止日期, 次级形态, 风险修饰项, 当前证据阶段, 适用产品合同, 文档状态, 是否具备审批条件).
+  - Cross-document metadata conflict (2): 产品主形态 (PRD=C端交互产品 vs Roadmap=服务编排); 当前交付目的 (PRD=规模化 vs Roadmap=决策演示).
+  - Outline violations (15): neither document has the required opening H2 sections; PRD’s only H2 is “当前效果”, Roadmap’s only H2 is “路线”.
+  - Missing universal contract tables (13): current-effect, reference/reuse, modules, requirements, truth-boundary, success, assumptions (PRD); capability-levels, versions, truth-boundary, assumptions, gates (Roadmap).
+  - Shape/risk contract gaps (3): missing C端交互产品 shape table; no A「模块」defined in either document; no A0「能力」; version codes R1/R2/R3 used but never defined in a version table.
+
+## Semantic review (12 dimensions, 0/2 each)
+
+| Dimension | Score | Reason |
+|---|---|---|
+| User and core task | 0 | No product user, task, context, or workaround present |
+| Current effect and evidence | 0 | Target state presented as current; sole source contradicts the claim |
+| Value path and bottleneck | 0 | No value path; a technical module list substitutes for value |
+| Product-shape fit | 0 | Primary shape disagrees across the pair, so no contract applies |
+| Product value and business logic | 0 | No user/business result or value loop |
+| Experience/production completeness | 0 | No entry, states, failure, recovery, or review |
+| Reuse and ownership | 0 | No reuse, source, license, or ownership |
+| Requirements and acceptance | 0 | No requirements, IDs, or acceptance evidence |
+| Roadmap logic | 0 | Technical sequence (首页→后端→测试), not value-driven versions |
+| Truth, risk, and authority | 0 | Truth mislabeled; external write implied with no authority |
+| Cross-document consistency | 0 | Material contradiction on shape and delivery purpose |
+| Readability and decision utility | 0 | No decision owner can locate actionable evidence |
+
+- Total: 0/24
+- Result label: `semantic_fail` (below 16/24, multiple quality-critical failures, material contradiction).
+
+## Approval blockers (rubric §approval blockers)
+
+1. Current behavior is materially unsupported, contradictory, and mislabeled.
+2. Product user, primary value surface, and selected direction remain mixed (shape conflict).
+3. External write (“自动提交用户申请”) lacks explicit authority and recovery.
+4. PRD and Roadmap disagree on product shape, current version, truth, assumptions, and next gate.
+5. The current version lacks user-visible exit evidence.
+
+## Quality-critical failures (rubric §quality-critical)
+
+1. Current behavior is invented / promoted beyond its evidence layer: PRD asserts “产品已经接入真实服务并能自动提交用户申请” while its only stated basis is “路线图计划在下一版接入服务” — the basis negates the assertion. The next-version plan is promoted to current proof.
+2. PRD and Roadmap materially contradict each other on product shape and delivery purpose.
+3. The selected route cannot be derived from user value and bottleneck: R1/R2/R3 are technical tasks (frontend/backend/test), not experience versions answering one user-value question each.
+
+## Structural vs product-judgment findings (separation required by the skill)
+
+- Structural (validator): missing metadata, sections, tables, codes — reparable by rewriting against the templates.
+- Product-judgment (semantic, validator does not cover): target-posing-as-current with a self-negating source; cross-document shape conflict; technical task list used as a value roadmap; un-authorized external write. These cannot be fixed by formatting alone; they require product decisions and evidence.
+
+## Audit-only immutability check
+
+```
+e031bab5e21bda2b5eb8343f523576a7b0be07343a75120035fd6f2bfdabce4d  evals/fixtures/audit-only/product-requirements.md
+1798ad93b57ee002d6ba5454f03b439955175901bff1b6bd41c55a8c808fc3da  evals/fixtures/audit-only/product-roadmap.md
+```
+
+sha256 before == sha256 after. No fixture byte was modified. Audit-only behavior confirmed.
+
+## Conclusion
+
+The audited pair is `semantic_fail` and `not approval-ready`. The most severe issues are product-judgment, not formatting: a future plan is presented as current capability with a self-negating source, the two documents disagree on what the product is, and a technical task list stands in for a value-driven roadmap. Structural repair is necessary but not sufficient.

@@ -2,6 +2,17 @@
 
 All notable changes to the project-local `define-product-and-roadmap` Skill are recorded here. The project follows Semantic Versioning for the packaged Skill.
 
+## 2.0.1 - 2026-08-10
+
+### Changed
+
+- Claude Code execution evidence upgraded from Blocked to Pass: the project-skill audit-only operation ran in a Claude Code host that exposes `Read` and `Bash`, producing a structural audit (49 errors) and a semantic self-review (0/24 `semantic_fail`) of the audit-only fixture, with fixture bytes left unchanged.
+- Added Claude Code audit-execution artifact under `test-results/claude/audit-only-execution.txt`; renamed `test-results/claude/discovery-blocked.md` to `test-results/claude/execution-passed.md`.
+
+### Notes
+
+- No skill-contract change (`SKILL.md`, references, templates, and validator logic are untouched). This is a PATCH release recording the Claude Code execution milestone and refreshed test evidence.
+
 ## 2.0.0 - 2026-08-09
 
 ### Added

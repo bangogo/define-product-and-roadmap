@@ -14,7 +14,7 @@
 | Codex artifact audit | Pass, 22/24 | Fresh-context document audit; reviewer labeled not independent |
 | Codex audit-only negative case | Correct fail, 49 errors, 0/24 | Bad-document detection and no-edit behavior |
 | Claude Code discovery | Pass | Correct `.claude/skills` directory loaded |
-| Claude Code audit execution | Blocked | Local host exposed no `Read` or `Bash`; no accepted artifact |
+| Claude Code audit execution | Pass | Structural audit + semantic self-review in a host with Read and Bash |
 | Portable ZIP | Pass | Archive contents, checksum, extracted validation, and source equality |
 
 ## Deterministic checks
@@ -73,16 +73,16 @@ Regression coverage includes all six primary shapes, secondary shapes, AI and tr
 
 ## Claude Code evaluation
 
-Claude Code 2.1.226 loaded the exact directory `/private/tmp/dpr-claude-v2.wZLPwS/.claude/skills/define-product-and-roadmap`, proving project discovery. Two audit attempts then reported that the host exposed neither local `Read` nor `Bash`, including an attempt with default tools and bypassed permission prompts. No document result was accepted. See `test-results/claude/discovery-blocked.md`.
+Claude Code loads the project directory `.claude/skills/define-product-and-roadmap` (symlink to the canonical source), proving project discovery. The v2.0.0 run (Claude Code 2.1.226 in `/private/tmp/dpr-claude-v2.wZLPwS`) was blocked: the non-interactive host exposed neither `Read` nor `Bash`, so audit execution stopped and no artifact was accepted. The v2.0.1 run executed end to end in a host with `Read` and `Bash`: the skill loaded, both `evals/fixtures/audit-only` files were read, `validate_product_docs.py` ran (49 errors), a 12-dimension semantic self-review scored 0/24 `semantic_fail`, and the fixture bytes were unchanged. See `test-results/claude/execution-passed.md` and `test-results/claude/audit-only-execution.txt`.
 
-Status taxonomy:
+Status taxonomy (v2.0.1):
 
 - Mentioned: Claude compatibility is a release goal.
 - Declared: standard Skill frontmatter and `.claude/skills` path exist.
 - Available: Claude loaded the exact project directory.
-- Executed: discovery ran; audit execution stopped at missing host tools.
-- Accepted artifact: none.
-- Semantic/product proof: not run.
+- Executed: discovery ran and audit-only execution completed in a host with `Read` and `Bash`.
+- Accepted artifact: `test-results/claude/audit-only-execution.txt` (structural + semantic audit of the negative fixture).
+- Semantic/product proof: not run (audit-only self-review of a fixture is not product proof).
 
 ## Package verification
 
