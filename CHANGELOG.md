@@ -2,6 +2,17 @@
 
 项目本地 `define-product-and-roadmap` 技能的所有重要变更记录于此。项目对打包的技能遵循语义化版本。
 
+## 2.2.0 - 2026-08-11
+
+### 新增
+
+- 兼容 WorkBuddy(腾讯 AI 办公 Agent):新增 `.workbuddy/skills/define-product-and-roadmap` 符号链接,`check_project.py` 的 `check_discovery_links` 覆盖第四个平台。WorkBuddy 采用轻量 skill 形态(`~/.workbuddy/skills/<name>/SKILL.md` 直接发现),本项目 frontmatter(`name`+`description`)天然通过 WorkBuddy 的 `quick_validate.py`,无需改 `SKILL.md` 或新增 `plugin.json`。
+- README 重构为“4 块前置”结构并补全 WorkBuddy:一句话场景 / 工作效果与互动澄清流程 / 三平台一键安装 / 逐文件说明前置,技术深度下沉为次级章节;安装章节新增 `.workbuddy/skills/` 符号链接与用户级 `~/.workbuddy/skills/` 命令。
+
+### 说明
+
+- 不改产品契约语义(形态/真值/编码/工作流不变),属 MINOR。`SKILL.md`、references、assets、验证器逻辑均未改动。35 个契约测试不变。
+
 ## 2.1.0 - 2026-08-10
 
 ### 新增

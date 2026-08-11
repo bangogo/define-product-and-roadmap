@@ -113,6 +113,7 @@ def check_discovery_links(errors: List[str]) -> None:
         Path(".agents/skills") / SKILL_NAME,
         Path(".claude/skills") / SKILL_NAME,
         Path(".codebuddy/skills") / SKILL_NAME,
+        Path(".workbuddy/skills") / SKILL_NAME,
     ):
         link = ROOT / relative
         if not link.is_symlink():
