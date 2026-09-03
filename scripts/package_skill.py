@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""构建确定性的 Agent Skills ZIP 与 SHA-256 校验和。"""
+"""构建确定性的 Agent Skills ZIP 与 SHA-256 校验和。
+
+要求 Python >= 3.7（zipfile.compresslevel 参数）,零第三方依赖。
+"""
 
 from __future__ import annotations
 
@@ -8,6 +11,9 @@ import subprocess
 import sys
 import zipfile
 from pathlib import Path
+
+if sys.version_info < (3, 7):
+    sys.exit("需要 Python 3.7 或更高版本")
 
 
 ROOT = Path(__file__).resolve().parents[1]

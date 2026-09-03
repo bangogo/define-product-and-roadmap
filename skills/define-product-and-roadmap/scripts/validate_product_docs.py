@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""验证基于证据、感知产品形态的 PRD 与 Roadmap Markdown。"""
+"""验证基于证据、感知产品形态与适用场景的 PRD 与 Roadmap Markdown（契约 3.0.0）。
+
+要求 Python >= 3.8,零第三方依赖。
+
+结构契约:
+- PRD 7 章 / Roadmap 6 章新目录
+- 需求为优先级分组的需求块（非宽表格）,按 P0/P1/P2 组织、不标版本
+- 各司其职硬校验:PRD 禁止版本落位表述;Roadmap 需求落位映射与 PRD 需求编号双向一一对应
+- 真值边界表唯一权威在 Roadmap
+- 场景维度:A（0→1 新产品）/B（存量迭代）分支校验
+"""
 
 from __future__ import annotations
 
@@ -22,6 +32,11 @@ BOXED_CAPABILITY_RE = re.compile(r"(?<![A-Z0-9])([A-Z][0-9]+)「([^」]+)」")
 VERSION_CODE_RE = re.compile(r"(?<![A-Z0-9])R(\d+)(?![A-Z0-9])")
 BOXED_VERSION_RE = re.compile(r"R(\d+)（第\s*(\d+)\s*个体验版本）「([^」]+)」")
 REQUIREMENT_RE = re.compile(r"P([0-3])-(\d{2,})「([^」]+)」")
+REQ_PLAIN_RE = re.compile(r"\bP([0-3])-(\d{2,})\b")
+REQ_BLOCK_RE = re.compile(
+    r"^\*\*(P[0-2]-(\d{2,}))「([^」]+)」\*\*（(?:优先级\s*)?(P[0-2])\s*·\s*模块\s*([A-Z](?:/[A-Z])*)）"
+)
+REQ_GROUP_RE = re.compile(r"^#{3,4}\s+\d+\.\d+\.\d+\s+P([0-2])\s*需求")
 OPEN_MARKER_RE = re.compile(r"\[待确认\]|\b(?:TODO|TBD)\b", re.IGNORECASE)
 PERCENT_TARGET_RE = re.compile(r"(?<![A-Za-z0-9])\d+(?:\.\d+)?%")
 TARGET_EVIDENCE_RE = re.compile(
@@ -33,6 +48,15 @@ PROCESS_HEADING_RE = re.compile(
     re.IGNORECASE,
 )
 SEMVER_RE = re.compile(r"^v?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$")
+SELF_VERSION_RE = re.compile(
+    r"(?:本文档|本需求文档|本产品需求文档|本\s*PRD|本路线图|本\s*Roadmap)"
+    r"\s*(?:[（(]\s*v?(\d+(?:\.\d+){1,2})\s*[）)]|v?(\d+\.\d+\.\d+))"
+)
+HEADER_HISTORY_RE = re.compile(r"修订要点|修订记录|修订历史|变更记录|变更摘要|合并基线|历史版本")
+HEADER_VERSION_SERIES_RE = re.compile(
+    r"v?\d+\.\d+(?:\.\d+)?(?:\s*[→,，、/]\s*v?\d+\.\d+(?:\.\d+)?)+"
+)
+VERSION_SINCE_RE = re.compile(r"[（(]v?\d+\.\d+(?:\.\d+)?\s*起[）)]")
 
 REQUIRED_METADATA = [
     "文档版本",
@@ -42,9 +66,32 @@ REQUIRED_METADATA = [
     "风险修饰项",
     "当前证据阶段",
     "当前交付目的",
+    "适用场景",
     "适用产品合同",
     "文档状态",
     "是否具备审批条件",
+]
+
+SCENARIO_A = "A（0→1 新产品）"
+SCENARIO_B = "B（存量迭代）"
+REAL_USE_STAGES = {"有限真实使用", "线上/规模化"}
+
+PRD_OUTLINE_KEYWORDS = [
+    "产品定位与承诺",
+    "现状与问题",
+    "产品方案",
+    "规则与红线",
+    "价值与成功指标",
+    "复用与依赖",
+    "风险与假设",
+]
+ROADMAP_OUTLINE_KEYWORDS = [
+    "用户与终局",
+    "现状与总路线",
+    "本版详单",
+    "体验版本路线图",
+    "能力层级",
+    "闸门与假设",
 ]
 
 PRIMARY_SHAPES = {
@@ -65,6 +112,12 @@ TRUTH_STATUSES = {"真实", "测试接入", "模拟", "人工承接", "仅有文
 ASSUMPTION_TYPES = {"必须为真", "重要假设", "可逆默认", "高风险外部事实"}
 ASSUMPTION_STATUSES = {"已确认", "建议假设，待确认", "待调研", "已否决"}
 
+DUP_SENTENCE_MIN = 12
+DUP_FRAGMENT_SIZE = 20
+DUP_FRAGMENT_HITS = 3
+DUP_MAX_REPORTS = 10
+AI_EVALUATION_HEADERS = ["评估维度", "评估载体", "基线采集动作", "裁决机制", "解锁条件"]
+
 SHAPE_TABLES = {
     "C端交互产品": ["场景", "进入页面", "页面呈现", "用户动作", "状态变化", "可见结果", "失败与恢复"],
     "内容/产物生产": ["阶段", "输入", "处理责任", "中间/最终产物", "质量门", "失败与恢复", "证据"],
@@ -73,6 +126,8 @@ SHAPE_TABLES = {
     "服务编排": ["服务场景", "用户触点", "承接方", "服务动作", "状态回流", "失败恢复", "责任边界"],
     "交易/市场": ["角色方", "发现/匹配", "信任保障", "交易动作", "履约结果", "争议恢复", "证据"],
 }
+
+REQ_FIVE_ELEMENTS = ["做什么", "你会看到", "规则", "验收", "证据"]
 
 
 @dataclass
@@ -106,7 +161,8 @@ def read_markdown(path: Path, errors: List[str]) -> str:
         return ""
     try:
         raw = path.read_bytes()
-        text = raw.decode("utf-8")
+        # utf-8-sig:剥除 Windows 记事本保存的 UTF-8 BOM,否则 BOM 附着首行导致元数据全失配
+        text = raw.decode("utf-8-sig")
     except UnicodeDecodeError as exc:
         errors.append(issue(str(path), "UTF-8", str(exc), "文件编码"))
         return ""
@@ -123,7 +179,13 @@ def _is_separator(line: str) -> bool:
 
 
 def _cells(line: str) -> List[str]:
-    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+    # 按非转义管道切分:单元格内的 `\|` 是合法转义,不能计入列边界;切分后还原为字面管道
+    body = line.strip()
+    if body.startswith("|"):
+        body = body[1:]
+    if body.endswith("|") and not body.endswith("\\|"):
+        body = body[:-1]
+    return [cell.strip().replace("\\|", "|") for cell in re.split(r"(?<!\\)\|", body)]
 
 
 def parse_tables(text: str) -> List[Table]:
@@ -211,6 +273,20 @@ def find_table(text: str, expected: Sequence[str]) -> Optional[Table]:
     return None
 
 
+def find_table_flex(
+    text: str,
+    exact: Sequence[str] = (),
+    startswith: Sequence[str] = (),
+) -> Optional[Table]:
+    """表头包含全部 exact 列,且每个 startswith 前缀至少有一列命中（用于「L0（第一级）」类变体）。"""
+    for table in parse_tables(text):
+        if not all(header in table.headers for header in exact):
+            continue
+        if all(any(column.startswith(prefix) for column in table.headers) for prefix in startswith):
+            return table
+    return None
+
+
 def expect_table(
     text: str,
     expected: Sequence[str],
@@ -225,11 +301,36 @@ def expect_table(
     return table
 
 
+def expect_table_flex(
+    text: str,
+    label: str,
+    location: str,
+    errors: List[str],
+    exact: Sequence[str] = (),
+    startswith: Sequence[str] = (),
+) -> Optional[Table]:
+    table = find_table_flex(text, exact, startswith)
+    if table is None:
+        found = [table.headers for table in parse_tables(text)]
+        errors.append(issue(label, f"表头包含 {list(exact)} 且存在以 {list(startswith)} 开头的列", f"现有表头 {found}", location))
+    return table
+
+
+def scenario_of(meta: Dict[str, str]) -> str:
+    value = meta.get("适用场景", "")
+    if value.startswith("A"):
+        return "A"
+    if value.startswith("B"):
+        return "B"
+    return ""
+
+
 def validate_metadata(
     prd: str,
     roadmap: str,
     errors: List[str],
-) -> Tuple[str, List[str], List[str]]:
+    warnings: List[str],
+) -> Tuple[str, List[str], List[str], str]:
     entries_by_label = {"PRD": metadata_entries(prd), "Roadmap": metadata_entries(roadmap)}
     data_by_label = {label: metadata(text) for label, text in (("PRD", prd), ("Roadmap", roadmap))}
 
@@ -263,6 +364,24 @@ def validate_metadata(
         except ValueError:
             errors.append(issue("PRD:metadata", "YYYY-MM-DD 日期", date_value, "证据截止日期"))
 
+    scenario_raw = prd_meta.get("适用场景", "")
+    scenario = scenario_of(prd_meta)
+    if scenario_raw and not scenario:
+        errors.append(issue("PRD:scenario", f"适用场景为「{SCENARIO_A}」或「{SCENARIO_B}」", scenario_raw, "适用场景"))
+
+    evidence_stage = prd_meta.get("当前证据阶段", "")
+    if evidence_stage and evidence_stage not in EVIDENCE_STAGES:
+        errors.append(issue("PRD:metadata", f"证据阶段属于 {sorted(EVIDENCE_STAGES)}", evidence_stage, "当前证据阶段"))
+    if scenario == "A" and evidence_stage in REAL_USE_STAGES:
+        warnings.append(
+            issue(
+                "PRD:scenario",
+                "证据阶段已进入真实使用,建议与用户确认切换为场景 B（回填 R0 基线、补 B 专属维度、升 minor 版）",
+                f"适用场景=A,证据阶段={evidence_stage}",
+                "A→B 演进承接",
+            )
+        )
+
     primary = prd_meta.get("产品主形态", "")
     if primary not in PRIMARY_SHAPES:
         errors.append(issue("PRD:product-shape", f"一个明确主形态 {sorted(PRIMARY_SHAPES)}", primary or "缺失", "产品主形态"))
@@ -287,9 +406,6 @@ def validate_metadata(
     if primary == "交易/市场" and "交易" not in risks:
         errors.append(issue("PRD:risk", "交易/市场主形态同时声明交易风险", str(risks) or "无", "风险修饰项"))
 
-    evidence_stage = prd_meta.get("当前证据阶段", "")
-    if evidence_stage and evidence_stage not in EVIDENCE_STAGES:
-        errors.append(issue("PRD:metadata", f"证据阶段属于 {sorted(EVIDENCE_STAGES)}", evidence_stage, "当前证据阶段"))
     purpose = prd_meta.get("当前交付目的", "")
     if purpose and purpose not in DELIVERY_PURPOSES:
         errors.append(issue("PRD:metadata", f"交付目的属于 {sorted(DELIVERY_PURPOSES)}", purpose, "当前交付目的"))
@@ -312,35 +428,20 @@ def validate_metadata(
             if risk not in contracts:
                 errors.append(issue("PRD:contracts", f"包含风险合同「{risk}」", contracts, "适用产品合同"))
 
-    return primary, secondaries, risks
+    return primary, secondaries, risks, scenario
 
 
 def validate_outline(prd: str, roadmap: str, errors: List[str]) -> None:
     prd_h2 = headings(prd)
     roadmap_h2 = headings(roadmap)
-    expected_prd = ["产品定位", "目标用户", "当前产品形态", "产品价值"]
-    for index, keyword in enumerate(expected_prd):
+    for index, keyword in enumerate(PRD_OUTLINE_KEYWORDS):
         actual = prd_h2[index] if index < len(prd_h2) else "缺失"
         if keyword not in actual:
             errors.append(issue("PRD:outline", f"第 {index + 1} 个 H2 包含「{keyword}」", actual, "PRD 开篇结构"))
-    expected_roadmap = ["核心用户任务", "当前基线"]
-    for index, keyword in enumerate(expected_roadmap):
+    for index, keyword in enumerate(ROADMAP_OUTLINE_KEYWORDS):
         actual = roadmap_h2[index] if index < len(roadmap_h2) else "缺失"
         if keyword not in actual:
             errors.append(issue("Roadmap:outline", f"第 {index + 1} 个 H2 包含「{keyword}」", actual, "Roadmap 开篇结构"))
-
-    for keyword in ["参考", "产品能力", "产品需求", "当前版本", "成功"]:
-        if not any(keyword in heading for heading in prd_h2):
-            errors.append(issue("PRD:outline", f"包含「{keyword}」的 H2", str(prd_h2), "PRD 目录"))
-    for keyword in ["产品能力层级", "体验版本", "当前版本", "依赖"]:
-        if not any(keyword in heading for heading in roadmap_h2):
-            errors.append(issue("Roadmap:outline", f"包含「{keyword}」的 H2", str(roadmap_h2), "Roadmap 目录"))
-
-    ref_index = next((i for i, h in enumerate(prd_h2) if "参考" in h), None)
-    for target in ["产品能力", "产品需求"]:
-        target_index = next((i for i, h in enumerate(prd_h2) if target in h), None)
-        if ref_index is not None and target_index is not None and ref_index > target_index:
-            errors.append(issue("PRD:outline", f"参考与复用早于「{target}」", "参考章节位于其后", "PRD 章节顺序"))
 
     for label, text in (("PRD", prd), ("Roadmap", roadmap)):
         for _, title in HEADING_RE.findall(text):
@@ -364,50 +465,106 @@ def validate_status_column(
             errors.append(issue(area, f"{header}属于 {sorted(allowed)}", actual, f"第 {table.line + offset} 行"))
 
 
-def validate_universal_tables(prd: str, roadmap: str, errors: List[str]) -> Dict[str, Optional[Table]]:
+def validate_universal_tables(
+    prd: str,
+    roadmap: str,
+    scenario: str,
+    errors: List[str],
+) -> Dict[str, Optional[Table]]:
     tables: Dict[str, Optional[Table]] = {}
-    tables["current"] = expect_table(prd, ["观察对象", "当前效果", "证据状态", "证据来源", "当前缺口"], "PRD:current-effect", "当前产品形态章节", errors)
-    validate_status_column(tables["current"], "证据状态", TRUTH_STATUSES, "PRD:current-effect", errors)
 
-    tables["reuse"] = expect_table(
-        prd,
-        ["来源", "版本/日期", "许可状态", "负责什么", "已证实能力", "产品映射", "复用决策", "项目补充", "用户价值", "证据边界"],
-        "PRD:reference-reuse",
-        "参考、复用与项目责任章节",
-        errors,
-    )
+    # B 场景必选当前效果表;A 场景允许缺失（章变形为问题假设与冷启动）
+    if scenario == "B":
+        tables["current"] = expect_table(
+            prd, ["观察对象", "当前效果", "证据状态", "证据来源", "当前缺口"], "PRD:current-effect", "现状与问题章节", errors
+        )
+        validate_status_column(tables["current"], "证据状态", TRUTH_STATUSES, "PRD:current-effect", errors)
+
+    # 复用注册:B 场景为复用决策注册;A 场景允许外部依赖表替代
+    if scenario == "B":
+        tables["reuse"] = expect_table(
+            prd,
+            ["来源", "版本/日期", "复用决策", "负责什么", "已证实能力", "产品映射", "证据边界"],
+            "PRD:reference-reuse",
+            "复用与依赖章节",
+            errors,
+        )
+    else:
+        tables["reuse"] = find_table(
+            prd, ["来源", "版本/日期", "复用决策", "负责什么", "已证实能力", "产品映射", "证据边界"]
+        ) or find_table(prd, ["依赖", "用途", "可用性"])
+
     tables["modules"] = expect_table(
         prd,
-        ["产品模块", "责任", "输入", "用户可见输出", "负责人", "主要状态", "失败与恢复", "当前优先级及依据"],
+        ["模块", "责任", "输入", "用户可见输出", "当前状态", "失败与恢复", "优先级"],
         "PRD:modules",
-        "产品能力章节",
+        "产品方案·能力地图章节",
         errors,
     )
-    tables["requirements"] = expect_table(
-        prd,
-        ["编号", "优先级", "模块", "产品要求", "用户可见结果", "业务规则", "技术验收边界", "证据状态"],
-        "PRD:requirements",
-        "产品需求章节",
-        errors,
-    )
-    tables["truth"] = expect_table(prd, ["层面", "当前实现", "真实性", "用户可见标识", "后续替换"], "PRD:truth-boundary", "当前版本章节", errors)
-    validate_status_column(tables["truth"], "真实性", TRUTH_STATUSES, "PRD:truth-boundary", errors)
-    tables["success"] = expect_table(prd, ["成功信号", "对应用户价值", "当前基线", "本版判定", "证据方法", "结论状态"], "PRD:success", "产品价值或成功章节", errors)
-    tables["prd_assumptions"] = expect_table(prd, ["类型", "假设或决策", "状态", "依据", "对产品影响", "确认人/下一步"], "PRD:assumptions", "成功、风险与假设章节", errors)
 
-    tables["levels"] = expect_table(roadmap, ["产品模块", "L0", "L1", "L2"], "Roadmap:capability-levels", "产品能力层级章节", errors)
-    tables["versions"] = expect_table(
-        roadmap,
-        ["体验版本", "用户任务", "核心能力", "用户可见结果", "本版主要增量", "主要验证问题", "进入条件", "退出条件", "状态"],
-        "Roadmap:versions",
-        "体验版本章节",
+    tables["success"] = expect_table_flex(
+        prd,
+        "PRD:success",
+        "价值与成功指标章节",
         errors,
+        exact=["成功信号", "对应用户价值", "当前基线", "本版判定", "证据方法", "结论状态"],
+        startswith=["指标组"],
+    )
+
+    tables["prd_assumptions"] = expect_table(
+        prd, ["类型", "假设或决策", "状态", "依据", "对产品影响", "确认人/下一步"], "PRD:assumptions", "风险与假设章节", errors
+    )
+
+    tables["levels"] = expect_table_flex(
+        roadmap,
+        "Roadmap:capability-levels",
+        "能力层级章节",
+        errors,
+        exact=["产品模块"],
+        startswith=["L0", "L1", "L2"],
+    )
+    tables["versions"] = expect_table_flex(
+        roadmap,
+        "Roadmap:versions",
+        "体验版本路线图·版本总表",
+        errors,
+        exact=["版本", "一句话任务", "状态"],
+        startswith=["你会看到什么"],
     )
     validate_status_column(tables["versions"], "状态", VERSION_STATUSES, "Roadmap:versions", errors)
-    tables["deliverables"] = expect_table(roadmap, ["交付项", "用户可见结果", "当前实现", "真实性", "验收证据", "不包含"], "Roadmap:truth-boundary", "当前版本章节", errors)
-    validate_status_column(tables["deliverables"], "真实性", TRUTH_STATUSES, "Roadmap:truth-boundary", errors)
-    tables["roadmap_assumptions"] = expect_table(roadmap, ["类型", "假设或决策", "状态", "依据", "对产品影响", "确认人/下一步"], "Roadmap:assumptions", "依赖、风险与假设章节", errors)
-    tables["gates"] = expect_table(roadmap, ["闸门", "所需证据", "决策人", "通过后授权", "未通过处理"], "Roadmap:gates", "版本闸门章节", errors)
+    if scenario == "B" and tables["versions"] is not None:
+        version_header = next(name for name in ("体验版本", "版本") if name in tables["versions"].headers)
+        version_index = tables["versions"].headers.index(version_header)
+        has_r0 = any(
+            version_index < len(row) and row[version_index].startswith("R0")
+            for row in tables["versions"].rows
+        )
+        if not has_r0:
+            errors.append(
+                issue("Roadmap:scenario", "B（存量迭代）场景的版本总表包含 R0 当前基线行", "未找到 R0 行", "版本总表")
+            )
+    tables["deliverables"] = expect_table(
+        roadmap,
+        ["交付项", "用户可见结果", "当前实现", "真实性", "验收证据"],
+        "Roadmap:deliverables",
+        "本版详单章节",
+        errors,
+    )
+    validate_status_column(tables["deliverables"], "真实性", TRUTH_STATUSES, "Roadmap:deliverables", errors)
+    tables["truth"] = expect_table(
+        roadmap, ["层面", "当前实现", "真实性", "用户可见标识", "后续替换"], "Roadmap:truth-boundary", "本版详单·真值边界表", errors
+    )
+    validate_status_column(tables["truth"], "真实性", TRUTH_STATUSES, "Roadmap:truth-boundary", errors)
+    tables["gates"] = expect_table(
+        roadmap,
+        ["闸门", "所需证据", "决策人", "通过后授权", "卡住回到哪"],
+        "Roadmap:gates",
+        "闸门与假设章节",
+        errors,
+    )
+    tables["roadmap_assumptions"] = expect_table(
+        roadmap, ["类型", "假设或决策", "状态", "依据", "对产品影响", "确认人/下一步"], "Roadmap:assumptions", "闸门与假设章节", errors
+    )
     return tables
 
 
@@ -421,14 +578,14 @@ def validate_shape_contracts(
     for shape in [primary] + list(secondaries):
         headers = SHAPE_TABLES.get(shape)
         if headers:
-            expect_table(prd, headers, f"PRD:shape:{shape}", f"{shape} 产品合同章节", errors)
+            expect_table(prd, headers, f"PRD:shape:{shape}", f"{shape} 产品合同章节（产品方案·系统运转）", errors)
 
     if risks:
         risk_table = expect_table(
             prd,
             ["风险修饰项", "触发场景", "潜在损害", "预防控制", "用户控制", "失败/未知状态", "审计证据", "发布/审批门"],
             "PRD:risk",
-            "风险合同章节",
+            "风险与假设章节",
             errors,
         )
         if risk_table:
@@ -442,8 +599,192 @@ def validate_shape_contracts(
             prd,
             ["场景", "触发入口", "携带上下文", "助手响应", "关键追问", "行动边界", "可见结果", "回退"],
             "PRD:risk:AI",
-            "AI 合同章节",
+            "AI 合同章节（产品方案·AI 参与边界）",
             errors,
+        )
+
+
+@dataclass
+class RequirementBlock:
+    line: int
+    identifier: str
+    priority: str
+    name: str
+    modules: List[str]
+
+
+def extract_requirement_blocks(prd: str) -> List[RequirementBlock]:
+    blocks: List[RequirementBlock] = []
+    for number, line in enumerate(prd.splitlines(), 1):
+        match = REQ_BLOCK_RE.match(line.strip())
+        if match:
+            blocks.append(
+                RequirementBlock(
+                    line=number,
+                    identifier=match.group(1),
+                    priority=match.group(4),
+                    name=match.group(3),
+                    modules=match.group(5).split("/"),
+                )
+            )
+    return blocks
+
+
+def requirement_section_lines(prd: str) -> List[Tuple[int, str]]:
+    """需求清单区段:自「x.2 需求清单」节标题（含引言）起,到下一个同级或更高级标题为止。"""
+    lines = prd.splitlines()
+    start = next(
+        (
+            index
+            for index, line in enumerate(lines)
+            if re.match(r"^#{2,4}\s+\d+\.\d+\s*需求清单", line.strip())
+        ),
+        None,
+    )
+    if start is None:
+        start = next((index for index, line in enumerate(lines) if REQ_GROUP_RE.match(line.strip())), None)
+    if start is None:
+        return []
+    result: List[Tuple[int, str]] = []
+    for index in range(start, len(lines)):
+        stripped = lines[index].strip()
+        # 终止条件与起始层级对称(起始容忍 H2-H4,则任何 H1-H4 标题都终止区段)
+        if index > start and re.match(r"^#{1,4}\s", stripped):
+            break
+        result.append((index + 1, stripped))
+    return result
+
+
+def validate_requirement_blocks(
+    prd: str,
+    modules: Dict[str, str],
+    errors: List[str],
+) -> List[str]:
+    """校验需求块格式、分组、五要素与模块映射;返回全部需求编号（供落位映射比对）。"""
+    lines = prd.splitlines()
+    blocks = extract_requirement_blocks(prd)
+
+    group_headers: List[Tuple[int, str]] = []
+    for number, line in enumerate(lines, 1):
+        match = REQ_GROUP_RE.match(line.strip())
+        if match:
+            group_headers.append((number, match.group(1)))
+
+    if not group_headers:
+        errors.append(
+            issue("PRD:requirements", "按 P0/P1/P2 优先级分组的需求小节（如「#### 3.2.1 P0 需求:…」）", "未找到分组标题", "产品方案·需求清单")
+        )
+    if blocks and not group_headers:
+        errors.append(issue("PRD:requirements", "需求块置于优先级分组小节之下", "存在需求块但无分组", "产品方案·需求清单"))
+
+    # 每个需求块的优先级须与其所在分组一致
+    seen: Set[str] = set()
+    for block in blocks:
+        if not REQUIREMENT_RE.fullmatch(f"{block.identifier}「{block.name}」"):
+            errors.append(
+                issue("PRD:requirement-id", "P0-01「要求名称」", f"{block.identifier}「{block.name}」", f"PRD:{block.line}")
+            )
+        if block.identifier in seen:
+            errors.append(issue("PRD:requirement-id", "唯一需求编号", block.identifier, f"PRD:{block.line}"))
+        seen.add(block.identifier)
+        for code in block.modules:
+            if code not in modules:
+                errors.append(
+                    issue("PRD:requirements", "需求块模块映射到能力地图已定义模块", f"{block.identifier} 引用 {code}", f"PRD:{block.line}")
+                )
+        enclosing = [level for number, level in group_headers if number < block.line]
+        if enclosing:
+            group_level = enclosing[-1]
+            if block.priority != f"P{group_level}":
+                errors.append(
+                    issue(
+                        "PRD:requirements",
+                        f"需求优先级与所在分组一致（P{group_level}）",
+                        f"{block.identifier} 标注 {block.priority}",
+                        f"PRD:{block.line}",
+                    )
+                )
+        # 五要素完整性:块首行到下一个需求块/标题之间(不设行数窗口,长需求块不漏扫)
+        following: List[str] = []
+        for offset in range(block.line, len(lines)):
+            text = lines[offset].strip()
+            if offset + 1 > block.line and (REQ_BLOCK_RE.match(text) or text.startswith("#")):
+                break
+            following.append(text)
+        body = "\n".join(following)
+        for element in REQ_FIVE_ELEMENTS:
+            if f"- {element}" not in body and f"- **{element}" not in body:
+                errors.append(
+                    issue("PRD:requirements", f"五要素行之一「- {element}：…」", f"{block.identifier} 缺该要素", f"PRD:{block.line}")
+                )
+
+    priorities = {block.priority for block in blocks}
+    if blocks and "P0" not in priorities:
+        errors.append(issue("PRD:requirements", "至少一组 P0（最高优先级）需求", str(sorted(priorities)), "产品方案·需求清单"))
+    return sorted(seen)
+
+
+def validate_separation_of_duties(
+    prd: str,
+    roadmap: str,
+    prd_requirement_ids: Sequence[str],
+    errors: List[str],
+) -> None:
+    """各司其职:PRD 不标版本;Roadmap 需求落位映射为唯一权威且与 PRD 编号双向一致。"""
+    # 1. PRD 全文禁止「落位 R*」类版本编排表述
+    for number, line in enumerate(prd.splitlines(), 1):
+        if re.search(r"落位\s*R\d", line):
+            errors.append(
+                issue("PRD:separation", "PRD 不标版本（版本落位只由 Roadmap 需求落位映射编排）", line.strip()[:60], f"PRD:{number}")
+            )
+
+    # 2. PRD 需求清单区段内不得出现体验版本编码（需求按优先级组织）
+    for number, line in requirement_section_lines(prd):
+        if VERSION_CODE_RE.search(line):
+            errors.append(
+                issue(
+                    "PRD:separation",
+                    "需求清单区段不出现 R* 版本编码（落位由 Roadmap 统一编排）",
+                    line[:60],
+                    f"PRD:{number}",
+                )
+            )
+
+    # 3. Roadmap 需求落位映射:存在性声明 + 双向一致
+    lines = roadmap.splitlines()
+    mapping_start = next(
+        (index for index, line in enumerate(lines) if re.match(r"^#{2,4}\s+\d+\.\d+\s*需求落位映射", line.strip())),
+        None,
+    )
+    if mapping_start is None:
+        errors.append(issue("Roadmap:separation", "「需求落位映射」小节（每条需求落位版本的唯一权威）", "未找到该小节", "体验版本路线图"))
+        return
+    mapping_ids: Set[str] = set()
+    uniqueness: Dict[str, int] = {}
+    for index in range(mapping_start + 1, len(lines)):
+        stripped = lines[index].strip()
+        # 终止条件与起始层级对称(起始容忍 H2-H4,则任何 H1-H4 标题都终止区段)
+        if re.match(r"^#{1,4}\s", stripped):
+            break
+        for level, number in REQ_PLAIN_RE.findall(stripped):
+            identifier = f"P{level}-{number}"
+            mapping_ids.add(identifier)
+            uniqueness[identifier] = uniqueness.get(identifier, 0) + 1
+
+    duplicated = sorted(identifier for identifier, count in uniqueness.items() if count > 1)
+    if duplicated:
+        errors.append(issue("Roadmap:separation", "同一需求只落位一个版本", f"重复出现 {duplicated}", "需求落位映射"))
+
+    prd_set = set(prd_requirement_ids)
+    unmapped = sorted(prd_set - mapping_ids)
+    unknown = sorted(mapping_ids - prd_set)
+    if unmapped:
+        errors.append(
+            issue("Roadmap:separation", "PRD 每条需求在落位映射中有落位版本", f"未落位 {unmapped}", "需求落位映射")
+        )
+    if unknown:
+        errors.append(
+            issue("Roadmap:separation", "落位映射只引用 PRD 已定义的需求编号", f"PRD 未定义 {unknown}", "需求落位映射")
         )
 
 
@@ -452,7 +793,10 @@ def canonical_modules_from_table(table: Optional[Table]) -> Tuple[Dict[str, str]
     conflicts: List[str] = []
     if table is None:
         return result, conflicts
-    module_index = table.headers.index("产品模块")
+    header = next((name for name in ("产品模块", "模块") if name in table.headers), None)
+    if header is None:
+        return result, conflicts
+    module_index = table.headers.index(header)
     for row in table.rows:
         if module_index >= len(row):
             continue
@@ -467,62 +811,56 @@ def canonical_modules_from_table(table: Optional[Table]) -> Tuple[Dict[str, str]
     return result, conflicts
 
 
-def validate_requirements(table: Optional[Table], modules: Dict[str, str], errors: List[str]) -> None:
-    if table is None:
-        return
-    id_index = table.headers.index("编号")
-    module_index = table.headers.index("模块")
-    seen: Set[str] = set()
-    for offset, row in enumerate(table.rows, 2):
-        if id_index >= len(row) or module_index >= len(row):
-            continue
-        requirement_id = row[id_index]
-        if not REQUIREMENT_RE.fullmatch(requirement_id):
-            errors.append(issue("PRD:requirement-id", "P0-01「要求名称」", requirement_id, f"PRD:{table.line + offset}"))
-        elif requirement_id in seen:
-            errors.append(issue("PRD:requirement-id", "唯一需求编号", requirement_id, f"PRD:{table.line + offset}"))
-        seen.add(requirement_id)
-        mapped = MODULE_RE.findall(row[module_index])
-        if not mapped:
-            errors.append(issue("PRD:requirements", "模块列使用 A「模块名称」", row[module_index], f"PRD:{table.line + offset}"))
-        for code, name in mapped:
-            if modules.get(code) != name:
-                errors.append(issue("PRD:requirements", "需求映射到已定义模块", f"{code}「{name}」", f"PRD:{table.line + offset}"))
-
-
 def validate_alignment(
     prd: str,
     roadmap: str,
     tables: Dict[str, Optional[Table]],
     errors: List[str],
-) -> None:
+) -> List[str]:
     prd_modules, prd_conflicts = canonical_modules_from_table(tables.get("modules"))
     roadmap_modules, roadmap_conflicts = canonical_modules_from_table(tables.get("levels"))
     if prd_conflicts:
-        errors.append(issue("PRD:modules", "每个模块代码只有一个名称", str(prd_conflicts), "产品能力章节"))
+        errors.append(issue("PRD:modules", "每个模块代码只有一个名称", str(prd_conflicts), "能力地图章节"))
     if roadmap_conflicts:
         errors.append(issue("Roadmap:modules", "每个模块代码只有一个名称", str(roadmap_conflicts), "能力层级章节"))
     if not prd_modules or not roadmap_modules:
-        errors.append(issue("cross-doc:modules", "PRD/Roadmap 均定义 A「名称」类模块", f"PRD={prd_modules}，Roadmap={roadmap_modules}", "产品能力章节"))
+        errors.append(issue("cross-doc:modules", "PRD/Roadmap 均定义 A「名称」类模块", f"PRD={prd_modules}，Roadmap={roadmap_modules}", "能力地图/能力层级章节"))
     elif prd_modules != roadmap_modules:
-        errors.append(issue("cross-doc:modules", "模块代码与名称一致", f"PRD={prd_modules}，Roadmap={roadmap_modules}", "两份文档产品能力章节"))
+        errors.append(issue("cross-doc:modules", "模块代码与名称一致", f"PRD={prd_modules}，Roadmap={roadmap_modules}", "两份文档能力章节"))
 
-    validate_requirements(tables.get("requirements"), prd_modules, errors)
+    for label, text, module_map in (
+        ("PRD", prd, prd_modules),
+        ("Roadmap", roadmap, roadmap_modules),
+    ):
+        if not module_map:
+            continue
+        for number, line in prose_lines(text):
+            for code, name in MODULE_RE.findall(line):
+                if code not in module_map:
+                    errors.append(issue(f"{label}:prose-codes", "散文中的模块编码在权威表定义", f"{code}「{name}」", f"{label}:{number}"))
+                elif module_map[code] != name:
+                    errors.append(issue(f"{label}:prose-codes", "散文中的模块名称与权威表一致", f"{code}「{name}」≠「{module_map[code]}」", f"{label}:{number}"))
+            for code, _ in BOXED_CAPABILITY_RE.findall(line):
+                if code[0] == "R" and code[1:].isdigit():
+                    continue
+                if code[0] not in module_map:
+                    errors.append(issue(f"{label}:prose-codes", "散文中的能力编码前缀映射到已定义模块", code, f"{label}:{number}"))
+
+    requirement_ids = validate_requirement_blocks(prd, prd_modules, errors)
 
     capability_cells: List[Tuple[str, str]] = []
     levels_table = tables.get("levels")
     if levels_table:
+        level_headers = [header for header in levels_table.headers if header.startswith(("L0", "L1", "L2"))]
         for offset, row in enumerate(levels_table.rows, 2):
-            for header in ("L0", "L1", "L2"):
+            for header in level_headers:
                 index = levels_table.headers.index(header)
                 if index < len(row):
                     capability_cells.append((row[index], f"Roadmap:{levels_table.line + offset}"))
-    version_table = tables.get("versions")
-    if version_table:
-        capability_index = version_table.headers.index("核心能力")
-        for offset, row in enumerate(version_table.rows, 2):
-            if capability_index < len(row):
-                capability_cells.append((row[capability_index], f"Roadmap:{version_table.line + offset}"))
+    # 每版详述的「核心能力」散文行同样纳入能力编码检查
+    for number, line in prose_lines(roadmap):
+        if line.startswith(("- 核心能力", "核心能力")):
+            capability_cells.append((line, f"Roadmap:{number}"))
 
     roadmap_capabilities: Dict[str, str] = {}
     for cell, location in capability_cells:
@@ -533,6 +871,8 @@ def validate_alignment(
             if code[0] not in roadmap_modules:
                 errors.append(issue("Roadmap:capability-code", "能力前缀映射到已定义模块", code, location))
         for match in CAPABILITY_RE.finditer(cell):
+            if match.group(1)[0] == "L":
+                continue  # L0/L1/L2 为成熟度等级刻度保留字，不是能力编码
             if not cell.startswith("「", match.end()):
                 errors.append(issue("Roadmap:capability-code", f"{match.group(1)}「能力名称」", cell, location))
     if not roadmap_capabilities:
@@ -540,22 +880,29 @@ def validate_alignment(
 
     defined_versions: Set[int] = set()
     planned_versions: List[int] = []
+    version_table = tables.get("versions")
     if version_table:
-        version_index = version_table.headers.index("体验版本")
+        version_header = next(name for name in ("体验版本", "版本") if name in version_table.headers)
+        version_index = version_table.headers.index(version_header)
         for offset, row in enumerate(version_table.rows, 2):
             if version_index >= len(row):
                 continue
             cell = row[version_index]
-            if cell == "R0「当前基线」":
+            # 总表接受短格式 R1「名称」（全称在每版详述块给出）或全格式 R1（第 1 个体验版本）「名称」
+            short = re.fullmatch(r"R(\d+)「([^」]+)」", cell)
+            full = BOXED_VERSION_RE.fullmatch(cell)
+            match = full or short
+            if not match:
+                errors.append(issue("Roadmap:version-code", "R1「名称」（总表短格式）或 R1（第 1 个体验版本）「名称」", cell, f"Roadmap:{version_table.line + offset}"))
+                continue
+            number = int(match.group(1))
+            if number == 0:
                 defined_versions.add(0)
                 continue
-            match = BOXED_VERSION_RE.fullmatch(cell)
-            if not match:
-                errors.append(issue("Roadmap:version-code", "R1（第 1 个体验版本）「名称」", cell, f"Roadmap:{version_table.line + offset}"))
-                continue
-            number, ordinal = int(match.group(1)), int(match.group(2))
-            if number == 0 or number != ordinal:
-                errors.append(issue("Roadmap:version-code", "非零版本号与中文序号一致", cell, f"Roadmap:{version_table.line + offset}"))
+            if full:
+                ordinal = int(full.group(2))
+                if number != ordinal:
+                    errors.append(issue("Roadmap:version-code", "非零版本号与中文序号一致", cell, f"Roadmap:{version_table.line + offset}"))
             if number in defined_versions:
                 errors.append(issue("Roadmap:version-code", "版本号唯一", cell, f"Roadmap:{version_table.line + offset}"))
             defined_versions.add(number)
@@ -567,13 +914,33 @@ def validate_alignment(
     used_versions = {int(number) for number in VERSION_CODE_RE.findall(roadmap)}
     missing = sorted(used_versions - defined_versions)
     if missing:
-        errors.append(issue("Roadmap:version-code", "所有版本代码在路线表中具名定义", str(missing), "体验版本路线图"))
+        errors.append(issue("Roadmap:version-code", "所有版本代码在版本总表中具名定义", str(missing), "体验版本路线图"))
+
+    # 每版详述:总表中每个非 R0 版本应有对应详述块（**R{n}（第 {n} 个体验版本）「…」**）,且序号一致
+    detail_versions: Set[int] = set()
+    for number, line in enumerate(roadmap.splitlines(), 1):
+        stripped = line.strip()
+        if stripped.startswith("**"):
+            for match in BOXED_VERSION_RE.finditer(stripped):
+                version_number, ordinal = int(match.group(1)), int(match.group(2))
+                if version_number != ordinal:
+                    errors.append(
+                        issue("Roadmap:version-code", "非零版本号与中文序号一致", match.group(0), f"Roadmap:{number}")
+                    )
+                detail_versions.add(version_number)
+    lacking_detail = sorted(set(planned_versions) - detail_versions)
+    if lacking_detail:
+        errors.append(
+            issue("Roadmap:version-detail", "版本总表每个非零版本有每版详述块", f"缺详述 R{lacking_detail}", "体验版本路线图·每版详述")
+        )
 
     prd_assumptions = tables.get("prd_assumptions")
     roadmap_assumptions = tables.get("roadmap_assumptions")
     if prd_assumptions and roadmap_assumptions:
         if prd_assumptions.rows != roadmap_assumptions.rows:
             errors.append(issue("cross-doc:assumptions", "两份文档的物质性假设行完全一致", f"PRD={prd_assumptions.rows}；Roadmap={roadmap_assumptions.rows}", "两份假设表"))
+
+    return requirement_ids
 
 
 def validate_assumptions(
@@ -633,6 +1000,188 @@ def validate_numeric_targets(documents: Sequence[Tuple[str, str]], errors: List[
                 errors.append(issue(f"{label}:numeric-target", "数字目标带来源、基线、提案或待验证状态", line.strip(), f"{label}:{number}"))
 
 
+def prose_lines(text: str) -> List[Tuple[int, str]]:
+    """返回正文行（跳过元数据区、标题、表格与代码围栏），带行号。"""
+    first_h2 = next((number for number, line in enumerate(text.splitlines(), 1) if line.startswith("## ")), 10**9)
+    result: List[Tuple[int, str]] = []
+    in_fence = False
+    for number, line in enumerate(text.splitlines(), 1):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence or number <= first_h2 or stripped.startswith(("|", "#")) or not stripped:
+            continue
+        result.append((number, stripped))
+    return result
+
+
+def _dup_normalize(text: str) -> str:
+    text = BOXED_VERSION_RE.sub(r"R\1", text)
+    text = BOXED_CAPABILITY_RE.sub(r"\1", text)
+    text = REQUIREMENT_RE.sub(r"P\1-\2", text)
+    text = MODULE_RE.sub(r"\1", text)
+    return re.sub(r"[^0-9A-Za-z一-鿿]", "", text)
+
+
+def validate_duplication(label: str, text: str, warnings: List[str]) -> None:
+    lines = prose_lines(text)
+    reported = 0
+
+    sentences: Dict[str, List[int]] = {}
+    for number, line in lines:
+        for piece in re.split(r"[。！？；!?;]", line):
+            normalized = _dup_normalize(piece)
+            if len(normalized) >= DUP_SENTENCE_MIN:
+                sentences.setdefault(normalized, []).append(number)
+    duplicated = [sentence for sentence, numbers in sentences.items() if len(numbers) >= 2]
+    duplicated.sort(key=lambda sentence: sentences[sentence][0])
+    for sentence in duplicated:
+        if reported >= DUP_MAX_REPORTS:
+            break
+        numbers = sentences[sentence]
+        warnings.append(
+            issue(
+                f"{label}:presentation:duplication",
+                "同一句子在一份文档正文只出现一次；复述处改为引用（如 见 §x）",
+                f"「{sentence[:24]}…」出现 {len(numbers)} 次",
+                f"{label}:{'、'.join(str(number) for number in numbers[:6])}",
+            )
+        )
+        reported += 1
+
+    stream_parts: List[str] = []
+    stream_lines: List[int] = []
+    for number, line in lines:
+        normalized_line = _dup_normalize(line)
+        if normalized_line:
+            stream_parts.append(normalized_line)
+            stream_lines.extend([number] * len(normalized_line))
+    stream = "".join(stream_parts)
+    counts: Dict[str, int] = {}
+    first_position: Dict[str, int] = {}
+    for start in range(max(0, len(stream) - DUP_FRAGMENT_SIZE + 1)):
+        fragment = stream[start:start + DUP_FRAGMENT_SIZE]
+        counts[fragment] = counts.get(fragment, 0) + 1
+        first_position.setdefault(fragment, start)
+    hot = sorted(
+        (fragment for fragment, count in counts.items() if count >= DUP_FRAGMENT_HITS),
+        key=lambda fragment: first_position[fragment],
+    )
+    cluster_end = -1
+    for fragment in hot:
+        if reported >= DUP_MAX_REPORTS:
+            break
+        position = first_position[fragment]
+        if position <= cluster_end:
+            continue
+        cluster_end = position + DUP_FRAGMENT_SIZE
+        if any(fragment in sentence for sentence in duplicated):
+            continue
+        warnings.append(
+            issue(
+                f"{label}:presentation:duplication",
+                f"相同片段出现少于 {DUP_FRAGMENT_HITS} 次；规则单源化后用引用替代",
+                f"「{fragment[:30]}…」出现 {counts[fragment]} 次",
+                f"{label}:{stream_lines[position]}",
+            )
+        )
+        reported += 1
+
+
+def validate_header_archaeology(label: str, text: str, warnings: List[str]) -> None:
+    first_h2 = next((number for number, line in enumerate(text.splitlines(), 1) if line.startswith("## ")), 10**9)
+    for number, line in enumerate(text.splitlines(), 1):
+        if number >= first_h2:
+            break
+        if line.startswith("- 文档版本："):
+            continue
+        if HEADER_HISTORY_RE.search(line) or HEADER_VERSION_SERIES_RE.search(line):
+            warnings.append(
+                issue(
+                    f"{label}:presentation:header-archaeology",
+                    "H1 与首个 H2 之间只保留 11 个元数据字段；修订史外置到 CHANGELOG 或独立修订文件",
+                    line.strip()[:60],
+                    f"{label}:{number}",
+                )
+            )
+            break
+
+
+def validate_version_archaeology(label: str, text: str, warnings: List[str]) -> None:
+    for number, line in enumerate(text.splitlines(), 1):
+        if line.startswith("- 文档版本："):
+            continue
+        match = VERSION_SINCE_RE.search(line)
+        if match:
+            warnings.append(
+                issue(
+                    f"{label}:presentation:version-archaeology",
+                    "版本沿革写入 CHANGELOG，不用「（0.x.y 起）」考古括号",
+                    match.group(0),
+                    f"{label}:{number}",
+                )
+            )
+
+
+def validate_self_version(label: str, text: str, errors: List[str]) -> None:
+    declared = metadata(text).get("文档版本", "").lstrip("v")
+    if not declared:
+        return
+    for number, line in enumerate(text.splitlines(), 1):
+        for match in SELF_VERSION_RE.finditer(line):
+            found = match.group(1) or match.group(2) or ""
+            if found and found != declared:
+                errors.append(
+                    issue(
+                        f"{label}:self-version",
+                        f"正文自引用版本与元数据「文档版本」一致（{declared}）",
+                        match.group(0),
+                        f"{label}:{number}",
+                    )
+                )
+
+
+def validate_table_convergence(label: str, text: str, warnings: List[str]) -> None:
+    seen: Dict[Tuple[str, ...], Table] = {}
+    for table in parse_tables(text):
+        key = tuple(table.headers)
+        if key in seen:
+            warnings.append(
+                issue(
+                    f"{label}:presentation:table-convergence",
+                    "表头完全相同的表格在一份文档内只出现一次；同轴信息合并为一张表",
+                    f"表头 {table.headers}",
+                    f"{label}:{seen[key].line} 与 {label}:{table.line}",
+                )
+            )
+        else:
+            seen[key] = table
+
+
+def validate_ai_evaluation(prd: str, risks: Sequence[str], warnings: List[str]) -> None:
+    if "AI" not in risks:
+        return
+    if find_table(prd, AI_EVALUATION_HEADERS) is None:
+        warnings.append(
+            issue(
+                "PRD:risk:AI-evaluation",
+                "AI 风险包含评估表（评估维度、评估载体、基线采集动作、裁决机制、解锁条件）",
+                "未找到该表",
+                "评估章节（先评价 → 再生成 → 后执行）",
+            )
+        )
+
+
+def validate_presentation(documents: Sequence[Tuple[str, str]], errors: List[str], warnings: List[str]) -> None:
+    for label, text in documents:
+        validate_duplication(label, text, warnings)
+        validate_header_archaeology(label, text, warnings)
+        validate_version_archaeology(label, text, warnings)
+        validate_table_convergence(label, text, warnings)
+        validate_self_version(label, text, errors)
+
+
 def emit_result(
     fmt: str,
     prd_path: Path,
@@ -669,6 +1218,13 @@ def emit_result(
 
 
 def main() -> int:
+    # Windows 控制台默认 GBK:强制 UTF-8 输出,避免中文诊断乱码或 UnicodeEncodeError
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (OSError, ValueError):
+                pass
     args = parse_args()
     errors: List[str] = []
     warnings: List[str] = []
@@ -680,13 +1236,16 @@ def main() -> int:
         if text:
             validate_markdown(path, text, errors)
     if prd and roadmap:
-        primary, secondaries, risks = validate_metadata(prd, roadmap, errors)
+        primary, secondaries, risks, scenario = validate_metadata(prd, roadmap, errors, warnings)
         validate_outline(prd, roadmap, errors)
-        tables = validate_universal_tables(prd, roadmap, errors)
+        tables = validate_universal_tables(prd, roadmap, scenario, errors)
         validate_shape_contracts(primary, secondaries, risks, prd, errors)
-        validate_alignment(prd, roadmap, tables, errors)
+        requirement_ids = validate_alignment(prd, roadmap, tables, errors)
+        validate_separation_of_duties(prd, roadmap, requirement_ids, errors)
         validate_assumptions(prd, tables.get("prd_assumptions"), errors, warnings)
         validate_numeric_targets((("PRD", prd), ("Roadmap", roadmap)), errors)
+        validate_ai_evaluation(prd, risks, warnings)
+        validate_presentation((("PRD", prd), ("Roadmap", roadmap)), errors, warnings)
         validate_open_markers(documents, args.allow_open_questions, errors, warnings)
 
     return emit_result(args.format, args.prd, args.roadmap, errors, warnings)
