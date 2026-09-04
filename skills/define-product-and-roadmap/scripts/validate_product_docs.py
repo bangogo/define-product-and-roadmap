@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""验证基于证据、感知产品形态与适用场景的 PRD 与 Roadmap Markdown（契约 3.0.0）。
+"""验证基于证据、感知产品形态与适用场景的 PRD 与 Roadmap Markdown（契约 3.2.0）。
 
 要求 Python >= 3.8,零第三方依赖。
 
@@ -9,6 +9,10 @@
 - 各司其职硬校验:PRD 禁止版本落位表述;Roadmap 需求落位映射与 PRD 需求编号双向一一对应
 - 真值边界表唯一权威在 Roadmap
 - 场景维度:A（0→1 新产品）/B（存量迭代）分支校验
+- 目录即地图:「## 目录」节与实际 H2/H3 标题双向一致（错误级）
+- 分组计数:分组标题声明的「N 条」与实际需求块数一致（错误级）
+- 跨文档去重:PRD 与 Roadmap ≥30 字相同正文行为警告（假设表逐字同源行白名单）
+- 口径一致:「连续 N 天」类观察窗口数值两文档不一致为警告
 """
 
 from __future__ import annotations
@@ -117,6 +121,12 @@ DUP_FRAGMENT_SIZE = 20
 DUP_FRAGMENT_HITS = 3
 DUP_MAX_REPORTS = 10
 AI_EVALUATION_HEADERS = ["评估维度", "评估载体", "基线采集动作", "裁决机制", "解锁条件"]
+
+TOC_TITLE = "目录"
+CROSS_DOC_DUP_MIN = 30
+TOC_ENTRY_LINK_RE = re.compile(r"^\[([^\]]+)\]\([^)]*\)$")
+CONSECUTIVE_DAYS_RE = re.compile(r"连续\s*(\d+)\s*天")
+REQ_GROUP_COUNT_RE = re.compile(r"（\s*(\d+)\s*条")
 
 SHAPE_TABLES = {
     "C端交互产品": ["场景", "进入页面", "页面呈现", "用户动作", "状态变化", "可见结果", "失败与恢复"],
@@ -432,8 +442,9 @@ def validate_metadata(
 
 
 def validate_outline(prd: str, roadmap: str, errors: List[str]) -> None:
-    prd_h2 = headings(prd)
-    roadmap_h2 = headings(roadmap)
+    # 「## 目录」是导航节,不计入正文章节序列
+    prd_h2 = [title for title in headings(prd) if title != TOC_TITLE]
+    roadmap_h2 = [title for title in headings(roadmap) if title != TOC_TITLE]
     for index, keyword in enumerate(PRD_OUTLINE_KEYWORDS):
         actual = prd_h2[index] if index < len(prd_h2) else "缺失"
         if keyword not in actual:
@@ -1001,7 +1012,7 @@ def validate_numeric_targets(documents: Sequence[Tuple[str, str]], errors: List[
 
 
 def prose_lines(text: str) -> List[Tuple[int, str]]:
-    """返回正文行（跳过元数据区、标题、表格与代码围栏），带行号。"""
+    """返回正文行（跳过元数据区、标题、表格、代码围栏与目录锚点行），带行号。"""
     first_h2 = next((number for number, line in enumerate(text.splitlines(), 1) if line.startswith("## ")), 10**9)
     result: List[Tuple[int, str]] = []
     in_fence = False
@@ -1011,6 +1022,9 @@ def prose_lines(text: str) -> List[Tuple[int, str]]:
             in_fence = not in_fence
             continue
         if in_fence or number <= first_h2 or stripped.startswith(("|", "#")) or not stripped:
+            continue
+        # 目录锚点行（- [标题](#锚点)）是导航,不是正文复述
+        if stripped.startswith("- ") and TOC_ENTRY_LINK_RE.match(stripped[2:].strip()):
             continue
         result.append((number, stripped))
     return result
@@ -1159,6 +1173,160 @@ def validate_table_convergence(label: str, text: str, warnings: List[str]) -> No
             seen[key] = table
 
 
+def heading_records(text: str) -> List[Tuple[int, int, str]]:
+    """带行号的 H1-H3 标题记录（跳过代码围栏）: (行号, 层级, 标题)。"""
+    result: List[Tuple[int, int, str]] = []
+    in_fence = False
+    for number, line in enumerate(text.splitlines(), 1):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        match = re.match(r"^(#{1,3})\s+(.+?)\s*$", stripped)
+        if match:
+            result.append((number, len(match.group(1)), match.group(2).strip()))
+    return result
+
+
+def toc_entries(text: str) -> Optional[Tuple[int, List[str]]]:
+    """「## 目录」节:返回 (目录标题行号, [条目标题]);无目录节返回 None。
+
+    条目兼容两种写法:「- [标题](#锚点)」链接式与「- 标题」纯文本式。
+    """
+    toc_line = next(
+        (number for number, level, title in heading_records(text) if level == 2 and title == TOC_TITLE),
+        None,
+    )
+    if toc_line is None:
+        return None
+    entries: List[str] = []
+    for number, line in enumerate(text.splitlines(), 1):
+        if number <= toc_line:
+            continue
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            break
+        if not stripped.startswith("-"):
+            continue
+        item = stripped[1:].strip()
+        link = TOC_ENTRY_LINK_RE.match(item)
+        entries.append((link.group(1) if link else item).strip())
+    return toc_line, entries
+
+
+def validate_toc_alignment(label: str, text: str, errors: List[str]) -> None:
+    toc = toc_entries(text)
+    if toc is None:
+        errors.append(
+            issue(
+                f"{label}:toc",
+                "元数据后存在「## 目录」节,目录行与实际 H2/H3 标题逐字一致",
+                "未找到目录节",
+                f"{label} 元数据之后",
+            )
+        )
+        return
+    _, entries = toc
+    actual = [
+        title
+        for _, level, title in heading_records(text)
+        if level in (2, 3) and title != TOC_TITLE
+    ]
+    entry_set, heading_set = set(entries), set(actual)
+    missing = [title for title in actual if title not in entry_set]
+    dangling = [title for title in entries if title not in heading_set]
+    if missing:
+        errors.append(
+            issue(
+                f"{label}:toc",
+                "每个 H2/H3 标题都在目录中列出（目录即地图）",
+                f"未列入目录 {missing[:6]}",
+                f"{label} 目录节",
+            )
+        )
+    if dangling:
+        errors.append(
+            issue(
+                f"{label}:toc",
+                "目录条目与实际标题一一对应（无失效条目）",
+                f"目录中无对应标题 {dangling[:6]}",
+                f"{label} 目录节",
+            )
+        )
+
+
+def validate_group_counts(prd: str, errors: List[str]) -> None:
+    lines = prd.splitlines()
+    group_headers: List[Tuple[int, str]] = [
+        (number, line.strip())
+        for number, line in enumerate(lines, 1)
+        if REQ_GROUP_RE.match(line.strip())
+    ]
+    for index, (number, header) in enumerate(group_headers):
+        declared = REQ_GROUP_COUNT_RE.search(header)
+        if declared is None:
+            continue
+        expected = int(declared.group(1))
+        end = group_headers[index + 1][0] if index + 1 < len(group_headers) else len(lines) + 1
+        actual = sum(
+            1 for candidate in range(number, min(end, len(lines) + 1)) if REQ_BLOCK_RE.match(lines[candidate - 1].strip())
+        )
+        if actual != expected:
+            errors.append(
+                issue(
+                    "PRD:requirements:group-count",
+                    f"分组标题声明「{expected} 条」与该组实际需求块数一致",
+                    f"实际 {actual} 条",
+                    f"PRD:{number}",
+                )
+            )
+
+
+def validate_cross_doc_duplication(prd: str, roadmap: str, warnings: List[str]) -> None:
+    """跨文档 ≥30 字相同正文行为警告;假设表「逐字同源」要求行白名单。"""
+    seen: Dict[str, List[str]] = {}
+    for label, text in (("PRD", prd), ("Roadmap", roadmap)):
+        whitelist = assumption_line_numbers(text)
+        for number, line in prose_lines(text):
+            if number in whitelist:
+                continue
+            normalized = _dup_normalize(line)
+            if len(normalized) < CROSS_DOC_DUP_MIN:
+                continue
+            seen.setdefault(normalized, []).append(f"{label}:{number}")
+    reported = 0
+    for normalized, locations in seen.items():
+        labels = {location.split(":", 1)[0] for location in locations}
+        if len(labels) < 2 or reported >= DUP_MAX_REPORTS:
+            continue
+        warnings.append(
+            issue(
+                "cross-doc:presentation:duplication",
+                "同一正文句行只在一份文档出现；跨文档复述收敛为单文档+引用（如「见 ROADMAP §n」）",
+                f"「{normalized[:24]}…」同时出现在 {len(locations)} 处",
+                "、".join(locations[:6]),
+            )
+        )
+        reported += 1
+
+
+def validate_window_consistency(prd: str, roadmap: str, warnings: List[str]) -> None:
+    prd_windows = {int(value) for value in CONSECUTIVE_DAYS_RE.findall(prd)}
+    roadmap_windows = {int(value) for value in CONSECUTIVE_DAYS_RE.findall(roadmap)}
+    if not prd_windows or not roadmap_windows or prd_windows == roadmap_windows:
+        return
+    warnings.append(
+        issue(
+            "cross-doc:window-consistency",
+            "「连续 N 天」类观察窗口口径在两文档一致（同一指标同一天数）",
+            f"PRD={sorted(prd_windows)} 天，Roadmap={sorted(roadmap_windows)} 天",
+            "两份文档的验收/退出条件",
+        )
+    )
+
+
 def validate_ai_evaluation(prd: str, risks: Sequence[str], warnings: List[str]) -> None:
     if "AI" not in risks:
         return
@@ -1180,6 +1348,7 @@ def validate_presentation(documents: Sequence[Tuple[str, str]], errors: List[str
         validate_version_archaeology(label, text, warnings)
         validate_table_convergence(label, text, warnings)
         validate_self_version(label, text, errors)
+        validate_toc_alignment(label, text, errors)
 
 
 def emit_result(
@@ -1246,6 +1415,9 @@ def main() -> int:
         validate_numeric_targets((("PRD", prd), ("Roadmap", roadmap)), errors)
         validate_ai_evaluation(prd, risks, warnings)
         validate_presentation((("PRD", prd), ("Roadmap", roadmap)), errors, warnings)
+        validate_group_counts(prd, errors)
+        validate_cross_doc_duplication(prd, roadmap, warnings)
+        validate_window_consistency(prd, roadmap, warnings)
         validate_open_markers(documents, args.allow_open_questions, errors, warnings)
 
     return emit_result(args.format, args.prd, args.roadmap, errors, warnings)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""产品 PRD/Roadmap 契约验证器的回归测试（契约 3.0.0:PRD 7 章/Roadmap 6 章、需求块、场景 A/B、各司其职）。
+"""产品 PRD/Roadmap 契约验证器的回归测试（契约 3.2.0:PRD 7 章/Roadmap 6 章、需求块、场景 A/B、各司其职、目录即地图、分组计数、跨文档去重、口径一致）。
 
 要求 Python >= 3.8,零第三方依赖。用当前解释器（sys.executable）调用验证器,兼容无 python3 命令的平台。
 """
@@ -110,6 +110,7 @@ def make_prd(
 | 外部服务 | 数据来源 | 未接入 | 未声明 | 降级人工 |"""
         current_effect = ""
         evidence_stage = "交互原型"
+        toc_current_effect = ""
     else:
         reuse_section = """| 来源 | 版本/日期 | 复用决策 | 负责什么 | 已证实能力 | 产品映射 | 证据边界 |
 |---|---|---|---|---|---|---|
@@ -122,6 +123,7 @@ def make_prd(
 | 当前原型 | 能完成一半任务 | 已观察 | 原型记录 | 结果未闭合 |
 """
         evidence_stage = "有限真实使用"
+        toc_current_effect = "  - [2.4 当前效果与缺口](#24-当前效果与缺口)\n"
     return f"""# Example Product Requirements
 
 - 文档版本：2.0.0
@@ -135,6 +137,20 @@ def make_prd(
 - 适用产品合同：{contracts(primary, secondary, risks)}
 - 文档状态：Proposed
 - 是否具备审批条件：{readiness}
+
+## 目录
+
+- [1. 产品定位与承诺](#1-产品定位与承诺)
+- [2. 现状与问题](#2-现状与问题)
+{toc_current_effect}  - [2.5 第一个价值瓶颈与最短价值路径](#25-第一个价值瓶颈与最短价值路径)
+- [3. 产品方案:能力、需求与运转](#3-产品方案能力需求与运转)
+  - [3.1 能力地图](#31-能力地图)
+  - [3.2 需求清单](#32-需求清单)
+  - [3.3 系统如何运转](#33-系统如何运转)
+- [4. 规则与红线](#4-规则与红线)
+- [5. 价值与成功指标](#5-价值与成功指标)
+- [6. 复用与依赖](#6-复用与依赖)
+- [7. 风险与假设](#7-风险与假设)
 
 ## 1. 产品定位与承诺
 
@@ -232,6 +248,22 @@ def make_roadmap(
 - 适用产品合同：{contracts(primary, secondary, risks)}
 - 文档状态：Proposed
 - 是否具备审批条件：{readiness}
+
+## 目录
+
+- [1. 用户与终局](#1-用户与终局)
+- [2. 现状与总路线](#2-现状与总路线)
+- [3. 本版详单:主任务闭环（R1，第 1 个体验版本）](#3-本版详单主任务闭环r1第-1-个体验版本)
+  - [3.1 本版范围与不包含](#31-本版范围与不包含)
+  - [3.2 交付清单与验收](#32-交付清单与验收)
+  - [3.3 真值边界表](#33-真值边界表)
+- [4. 体验版本路线图](#4-体验版本路线图)
+  - [4.1 一句话路线总述](#41-一句话路线总述)
+  - [4.2 版本总表](#42-版本总表)
+  - [4.3 每版详述](#43-每版详述)
+  - [4.4 需求落位映射](#44-需求落位映射)
+- [5. 能力层级（参考）](#5-能力层级参考)
+- [6. 闸门与假设](#6-闸门与假设)
 
 ## 1. 用户与终局
 
@@ -703,6 +735,72 @@ class ContractTests(unittest.TestCase):
         result = self.run_validator(prd, make_roadmap("C端交互产品", risks="AI"))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("risk:AI-evaluation", result.stderr)
+
+    # --- v3.2.0:目录即地图 / 分组计数 / 跨文档去重 / 口径一致 ---
+
+    def test_toc_missing_fails(self) -> None:
+        prd = make_prd("内容/产物生产").replace("## 目录", "## 总览", 1)
+        self.assert_fails_with(prd, make_roadmap("内容/产物生产"), "PRD:toc")
+
+    def test_toc_dangling_entry_fails(self) -> None:
+        prd = make_prd("内容/产物生产").replace("- [7. 风险与假设](#7-风险与假设)", "- [7. 风险与遗留](#7-风险与遗留)", 1)
+        self.assert_fails_with(prd, make_roadmap("内容/产物生产"), "PRD:toc")
+
+    def test_toc_heading_not_listed_fails(self) -> None:
+        prd = make_prd("内容/产物生产") + "\n## 8. 附录\n补充说明。\n"
+        self.assert_fails_with(prd, make_roadmap("内容/产物生产"), "PRD:toc")
+
+    def test_toc_scenario_a_passes(self) -> None:
+        result = self.run_validator(
+            make_prd("C端交互产品", scenario="A（0→1 新产品）"),
+            make_roadmap("C端交互产品", scenario="A（0→1 新产品）"),
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_group_count_mismatch_fails(self) -> None:
+        prd = make_prd("内容/产物生产").replace("（1 条,最高优先级）", "（2 条,最高优先级）")
+        self.assert_fails_with(prd, make_roadmap("内容/产物生产"), "group-count")
+
+    def test_group_count_consistent_passes(self) -> None:
+        prd = make_prd("内容/产物生产")
+        result = self.run_validator(prd, make_roadmap("内容/产物生产"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("group-count", result.stderr)
+
+    def test_cross_doc_duplicate_warns(self) -> None:
+        sentence = "本产品承诺在同一价值路径上先闭合主任务再逐步扩展信任边界并全程保留人工回退入口。"
+        prd = make_prd("内容/产物生产").replace("帮助用户完成一项有价值的任务;本版不包含真实外部写入。", sentence)
+        roadmap = make_roadmap("内容/产物生产").replace("用户完成主任务并看见结果。", sentence)
+        result = self.run_validator(prd, roadmap)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("cross-doc:presentation:duplication", result.stderr)
+
+    def test_assumption_rows_do_not_trigger_cross_doc_dup(self) -> None:
+        result = self.run_validator(make_prd("内容/产物生产"), make_roadmap("内容/产物生产"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("cross-doc:presentation:duplication", result.stderr)
+
+    def test_window_consistency_mismatch_warns(self) -> None:
+        prd = make_prd("内容/产物生产").replace(
+            "通过评审只授权进入下一闸门", "验收要求连续 7 天稳定运行;通过评审只授权进入下一闸门"
+        )
+        roadmap = make_roadmap("内容/产物生产").replace(
+            "退出条件:路径证据并进入评审。", "退出条件:连续 14 天稳定运行。"
+        )
+        result = self.run_validator(prd, roadmap)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("cross-doc:window-consistency", result.stderr)
+
+    def test_window_consistency_aligned_passes(self) -> None:
+        prd = make_prd("内容/产物生产").replace(
+            "通过评审只授权进入下一闸门", "验收要求连续 7 天稳定运行;通过评审只授权进入下一闸门"
+        )
+        roadmap = make_roadmap("内容/产物生产").replace(
+            "退出条件:路径证据并进入评审。", "退出条件:连续 7 天稳定运行。"
+        )
+        result = self.run_validator(prd, roadmap)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("cross-doc:window-consistency", result.stderr)
 
 
 if __name__ == "__main__":

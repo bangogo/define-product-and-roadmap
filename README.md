@@ -2,7 +2,7 @@
 
 > 给产品经理和业务负责人：把“这个产品到底成不成立”从拍脑袋，变成一份**证据驱动的产品契约**——说清“谁获得价值、现在能证明什么、第一个瓶颈在哪、哪个证据能解锁下一版”，并明确标出它**现在是否已具备审批条件**。
 
-![version](https://img.shields.io/badge/version-3.1.0-blue)
+![version](https://img.shields.io/badge/version-3.2.0-blue)
 ![platform](https://img.shields.io/badge/platform-Claude%20Code%20%7C%20Codex%20%7C%20WorkBuddy-green)
 ![license](https://img.shields.io/badge/license-MIT-orange)
 ![python](https://img.shields.io/badge/validator-Python%203-blue)
@@ -63,6 +63,7 @@
 
 ```
 PRD（7 章）                          Roadmap（6 章）
+├─ 0 目录（3.2.0 新增，与标题逐字一致）├─ 0 目录（3.2.0 新增，与标题逐字一致）
 ├─ 1 产品定位与承诺                  ├─ 1 用户与终局
 ├─ 2 现状与问题        ← 场景变形    ├─ 2 现状与总路线
 ├─ 3 产品方案：能力、需求与运转       ├─ 3 本版详单（真值边界表在这里）
@@ -73,7 +74,15 @@ PRD（7 章）                          Roadmap（6 章）
 └─ 7 风险与假设
 ```
 
-**各司其职（3.0.0 硬校验）**：PRD 按优先级组织需求、只定“做什么与怎么验收”、**不标版本**；每条需求进哪个版本，只在 Roadmap §4.4 需求落位映射维护——它是唯一权威，验证器双向比对两文档编号一一对应。旧版两头写版本编排、一处更新他处遗漏的问题就此根治。
+**各司其职（3.0.0 硬校验）**：PRD 按优先级组织需求、只定“做什么与怎么验收”、**不标版本**；每条需求进哪个版本，只在 Roadmap §4.4 需求落位映射维护——它是唯一权威，验证器双向比对两文档编号一一对应。旧版两头写版本编排、一处更新他处遗漏的问题就此根治。分工一句话：**PRD 写需求与生效逻辑，Roadmap 写各阶段执行拆解**；两文档 ≥30 字的相同正文行会被验证器报警，收敛到单文档+引用。
+
+**信息结构化（3.2.0）**：两份文档都在元数据后带「## 目录」节，目录行与实际 H2/H3 标题逐字双向一致（验证器错误级）——单看目录就能重建文档逻辑地图；语言精炼进契约（需求块「做什么」≤2 句、段落建议 ≤5 句、修饰性空话不入契约）；需求分组标题声明「N 条」与实际块数核对（错误级）。
+
+**存量升级先摸排（3.2.0，B 场景硬约束）**：升级/重写存量产品文档前，先做只读 7 维现状摸排（交互触点 / 流程主链 / 大模型与脚本分工 / 边界兜底 / 安装分发 / 资产生命周期 / 初始化与扩展性），产出问题清单、你确认优先级后才动笔——避免“没摸清现状就重写”造成的整轮返工。
+
+**施工期运行兼容（3.2.0，B 场景）**：历史版本还在运行、数据持续产生时，时间口径三时点锚定——基线锚定**执行日快照**（其后新增走日常机制）、验收锚定**验收时点**（回涨即失败）、「连续 N 天」从交付项**合入上线日**起算（老路径天数不计入）；安全网（回滚点/可观测性）最先合入。不写工期估计，只写依赖顺序。
+
+**发布前评审矩阵（3.2.0，每次必做）**：验证器 0 错误后，必须跑 4 个独立只读评审——诉求覆盖度、跨文档一致性、现状事实一致性、双视角可读性（产品经理+业务负责人 3 分钟四问）；发现按「阻塞/建议」分级处理完毕才可交付。
 
 ### 它会主动问你什么（核心设计）
 
@@ -119,13 +128,13 @@ PRD（7 章）                          Roadmap（6 章）
 
 | 步骤 | 做什么 |
 |---|---|
-| 1. 确定范围与权限 | 判定操作（审计/创建/重写/对齐）、交付物、交付目标；“批准”只授权进入下一闸门 |
-| 2. 阅读权威证据 | 按 已批准契约 → 已接受决策 → 运行时/产物证据 → 当前研究 → 历史 的顺序读 |
+| 1. 确定范围与权限 | 判定操作（审计/创建/重写/对齐）、交付物、交付目标；rewrite 先出目录提案等你拍板；“批准”只授权进入下一闸门 |
+| 2. 阅读权威证据 | 按 已批准契约 → 已接受决策 → 运行时/产物证据 → 当前研究 → 历史 的顺序读；**存量升级先做只读 7 维现状摸排，问题清单确认优先级后才起草** |
 | 3. 构建内部产品简报 | 记录 当前用户与核心任务、价值载体、当前结果、最短价值路径、第一个弱转折、交付目的、下一闸门 等 12 个字段 |
 | 4. 分类形态与风险 | 选定**唯一**主形态（用户在哪里获得价值的那一类）+ ≤2 个次级形态 + 风险修饰项 |
 | 5. 关闭会改变决策的未知项 | **一次只问一个高影响问题**（见上 ①–⑥） |
 | 6. 起草所选契约 | 合并 通用 + 主形态 + 次级形态 + 风险 契约，按模板填充 |
-| 7. 验证确切交付物 | 对交付字节跑确定性验证器 |
+| 7. 验证确切交付物 | 对交付字节跑确定性验证器；**0 错误后必跑 4 视角独立只读评审矩阵**，阻塞项清零才结束 |
 | 8. 语义审查 | 12 维度评分，标注自审 / 独立审查 |
 
 **结束条件**：业务、产品、体验、技术四个负责人，各自能答出 8 个问题（谁获得价值、现在什么能用+证据、哪些契约适用、什么被复用/新建/模拟、主旅程如何成功并恢复、Roadmap 顺序为何跟随价值证据、还剩哪些假设+是否具备审批条件、哪个证据退出当前版本激活哪个闸门）——全部能答，才结束。
@@ -208,7 +217,7 @@ ln -sfn "$PWD/skills/define-product-and-roadmap" ~/.codebuddy/skills/define-prod
 
 ### 方式三：WorkBuddy 技能市场导入本地包
 
-从 [GitHub Release](https://github.com/bangogo/define-product-and-roadmap/releases) 下载 `dist/define-product-and-roadmap-3.1.0.zip`，在 WorkBuddy 打开**技能市场 → 添加技能 → 上传技能包**，选中该 zip，系统自动配置（CodeBuddy 同样支持此导入方式）。
+从 [GitHub Release](https://github.com/bangogo/define-product-and-roadmap/releases) 下载 `dist/define-product-and-roadmap-3.2.0.zip`，在 WorkBuddy 打开**技能市场 → 添加技能 → 上传技能包**，选中该 zip，系统自动配置（CodeBuddy 同样支持此导入方式）。
 
 ### 安装后验证
 
@@ -238,7 +247,7 @@ python3 scripts/check_project.py
 define-product-and-roadmap/
 ├── README.md                 # 本文件（项目级指引）
 ├── CHANGELOG.md              # 版本变更记录
-├── VERSION                   # 3.1.0（与技能内 VERSION 必须一致）
+├── VERSION                   # 3.2.0（与技能内 VERSION 必须一致）
 ├── LICENSE                   # MIT
 ├── scripts/                  # 项目级检查门 + 打包
 ├── dist/                     # 可移植发布 zip + SHA-256
@@ -257,13 +266,13 @@ define-product-and-roadmap/
 | 文件 / 目录 | 作用 |
 |---|---|
 | `README.md` | 项目级指引（你正在看的） |
-| `CHANGELOG.md` | 语义化版本变更记录（1.0.0-imported → 2.0.0 → … → 3.1.0，含旧→新契约校验点映射表） |
+| `CHANGELOG.md` | 语义化版本变更记录（1.0.0-imported → 2.0.0 → … → 3.2.0，含旧→新契约校验点映射表） |
 | `VERSION` | 单行版本号，必须与技能内 `VERSION` 一致（由检查门强制） |
 | `LICENSE` | MIT，Copyright (c) 2026 luckyban |
 | `.gitignore` | 排除 Python 字节码、`.DS_Store`、`dist` 临时文件、运行时产物等 |
 | `scripts/check_project.py` | **项目总检查门**：必需文件、frontmatter 纯净、版本对齐、三平台符号链接、62 个契约测试、Python 编译、可选 `--verify-dist` |
 | `scripts/package_skill.py` | 确定性打包：先跑检查门 → 生成 `dist/*.zip`（固定时间戳）+ SHA-256 |
-| `dist/` | 发布归档（2.0.0 – 3.1.0）+ 各自 `.sha256` |
+| `dist/` | 发布归档（2.0.0 – 3.2.0）+ 各自 `.sha256` |
 | `docs/` | `audit-report.md`（技能审计）、`skill-standards-audit.md`（3.1.0 标准符合性评估）、`test-report.md`（测试报告）、`baseline-source-sha256.txt`（导入基线） |
 | `evals/` | `cases.jsonl`（15 个评估用例：触发 + 语义 + 场景 A/B + 仅审计）+ `fixtures/`（5 个证据包） |
 | `test-results/` | Codex 4 组（子目录）+ Claude 2 份执行记录（平铺文件），作为有效性证据 |
@@ -272,18 +281,18 @@ define-product-and-roadmap/
 
 | 文件 / 目录 | 作用 |
 |---|---|
-| [`SKILL.md`](skills/define-product-and-roadmap/SKILL.md) | **技能入口**（179 行）：frontmatter + 8 步工作流 + 发布元数据 + 硬边界 + 结束条件 |
-| `VERSION` | 单行 `3.1.0` |
+| [`SKILL.md`](skills/define-product-and-roadmap/SKILL.md) | **技能入口**（195 行）：frontmatter + 8 步工作流（目录提案确认、B 场景摸排、4 视角评审矩阵）+ 发布元数据 + 硬边界 + 结束条件 |
+| `VERSION` | 单行 `3.2.0` |
 | `agents/openai.yaml` | Codex / OpenAI UI 元数据（display_name、short_description、`$define-product-and-roadmap` 调用） |
-| [`references/intent-and-scenario-contract.md`](skills/define-product-and-roadmap/references/intent-and-scenario-contract.md) | 意图/场景契约：操作权限、证据台账、适用场景判定（A/B）、6 类主形态、风险修饰项、提问工作流、假设登记 |
-| `references/prd-contract.md` | PRD 契约：7 章结构、场景维度矩阵（A/B 变形）、各司其职三分工、呈现规则 10 条、通用表格与需求块、形态/风险专属契约（含 AI 评估表）、审批条件 |
-| `references/roadmap-contract.md` | Roadmap 契约：6 章新版式、本版详单与真值边界表、版本总表+每版详述、需求落位映射唯一权威、能力语言、评价先行、治理状态 |
-| `references/quality-rubric.md` | 12 维度语义评分表（满分 24）+ 8 项审批阻塞项 + 结果标签 |
-| `references/revision-lessons.md` | 修订经验 31 条：症状 → 目标形态 → 修复动作 |
-| `assets/prd-template.md` | PRD 空白模板（7 个 H2 + 元数据块 + 需求块分组 + A/B 变形占位注释） |
-| `assets/roadmap-template.md` | Roadmap 空白模板（6 个 H2 + 版本总表 + 每版详述 + 需求落位映射） |
-| `scripts/validate_product_docs.py` | **确定性验证器**（1255 行）：校验结构、11 字段元数据、场景分支（A/B + A→B 切换警告）、需求块、各司其职 3 硬校验、真值标签、形态契约、ID 与跨文档一致性、呈现规则 |
-| `scripts/test_contract.py` | 验证器回归测试（62 个用例） |
+| [`references/intent-and-scenario-contract.md`](skills/define-product-and-roadmap/references/intent-and-scenario-contract.md) | 意图/场景契约：操作权限、证据台账、适用场景判定（A/B）、B 场景 7 维现状摸排、快照维护规则、6 类主形态、风险修饰项、提问工作流、假设登记 |
+| `references/prd-contract.md` | PRD 契约：7 章结构、场景维度矩阵（A/B 变形）、各司其职三分工、呈现规则 12 条（目录即地图/语言精炼）、通用表格与需求块、形态/风险专属契约（含 AI 评估表）、审批条件 |
+| `references/roadmap-contract.md` | Roadmap 契约：6 章新版式、本版详单与真值边界表、版本总表+每版详述、需求落位映射唯一权威、能力语言、评价先行、施工期运行兼容三时点口径、闸门执行就绪结论、治理状态 |
+| `references/quality-rubric.md` | 12 维度语义评分表（满分 24）+ 8 项审批阻塞项 + 4 视角评审矩阵 brief + 结果标签 |
+| `references/revision-lessons.md` | 修订经验 36 条：症状 → 目标形态 → 修复动作 |
+| `assets/prd-template.md` | PRD 空白模板（目录节 + 7 个 H2 + 元数据块 + 需求块分组 + A/B 变形占位注释） |
+| `assets/roadmap-template.md` | Roadmap 空白模板（目录节 + 6 个 H2 + 版本总表 + 每版详述 + 需求落位映射） |
+| `scripts/validate_product_docs.py` | **确定性验证器**（1427 行）：校验结构、11 字段元数据、场景分支（A/B + A→B 切换警告）、需求块、各司其职 3 硬校验、真值标签、形态契约、ID 与跨文档一致性、呈现规则、目录↔标题双向一致、分组计数、跨文档重复行、连续 N 天口径 |
+| `scripts/test_contract.py` | 验证器回归测试（72 个用例） |
 
 > 想读完整的技能指令、8 步流程原文与硬边界，深入阅读 [SKILL.md](skills/define-product-and-roadmap/SKILL.md)。
 

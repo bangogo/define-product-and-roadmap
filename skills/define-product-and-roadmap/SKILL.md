@@ -12,13 +12,15 @@ description: 本技能用于在用户要求创建、审计、重写或对齐基�
 1. 在分类产品或提问之前,务必先读 [references/intent-and-scenario-contract.md](references/intent-and-scenario-contract.md)（形态判错会级联选错后续全部契约）。
 2. 创建、审计或重写 PRD 时,读 [references/prd-contract.md](references/prd-contract.md)。
 3. 创建、审计或重写 Roadmap 时,读 [references/roadmap-contract.md](references/roadmap-contract.md)。
-4. 创建、审计、修订或采纳反馈时,读 [references/revision-lessons.md](references/revision-lessons.md)（31 条反模式,起草即规避）。
+4. 创建、审计、修订或采纳反馈时,读 [references/revision-lessons.md](references/revision-lessons.md)（36 条反模式,起草即规避）。
 5. 最终语义审查前,读 [references/quality-rubric.md](references/quality-rubric.md)。
 6. 默认复用文档现有结构;创建新文件 或 结构已不可修复 → 才用 [assets/prd-template.md](assets/prd-template.md) 与 [assets/roadmap-template.md](assets/roadmap-template.md)（避免重排用户已有文档结构）。
 
 ## 1. 确定范围与权限
 
 确定请求的操作:`audit only`(仅审计)、`create`(创建)、`rewrite`(重写)或 `align`(对齐)。确定用户需要 PRD、Roadmap 还是对齐的一对,以及交付目标是文件还是会话内 Markdown。
+
+**目录提案确认协议**：在执行 `rewrite`（重写）或重大结构性重构前，必须先出一级/二级/三级目录提案 + 每章一句话说明，提交用户拍板确认后再动笔书写正文（防止目录架构偏离导致大面积返工）。
 
 仅审计(audit-only)请求期间不要编辑文件。把“批准某份文档”视为仅授权进入所指明的下一个闸门;它不授权实现、发布、账户访问或外部写入。
 
@@ -27,6 +29,8 @@ description: 本技能用于在用户要求创建、审计、重写或对齐基�
 按以下顺序阅读最小相关证据集:
 
 `已批准产品契约 → 已接受决策 → 当前运行时或产物证据 → 当前研究 → 历史材料`
+
+**B 场景起草前现状摸排（硬约束）**：在升级或重写存量产品文档（B 场景）前，严禁凭印象起草。必须先进行只读的**现状摸排**（可多 Agent 并行），全面排查 7 个核心维度（交互界面与用户触点、系统流程主链、大模型与脚本分工、边界条件兜底、安装与分发链路、知识资产生命周期、初始化与扩展性；详细清单见 [references/intent-and-scenario-contract.md](references/intent-and-scenario-contract.md)）。产出分维问题清单，并经用户确认优先级后，方可进入起草阶段。
 
 在起草前,检查当前 README、正式产品文档、已接受的 ADR 或决策、研究、归档,以及相关运行时或产物。先从可发现的事实解决,再向用户提问。保留无关变更。
 
@@ -131,9 +135,21 @@ python3 <技能目录>/scripts/validate_product_docs.py \
 
 只请求一份文档 → 创建声明相同元数据与契约的临时配对文档 → 验证这一对 → 仅删除临时文件。会话内交付 → 把提议的 Markdown 落到临时目录 → 验证那些确切字节。
 
-修复每个错误 → 重跑验证器 → 0 错误后才进入语义审查;审阅每个警告。然后对确切交付物应用 [references/quality-rubric.md](references/quality-rubric.md)。对于实质性文档,报告 12 维总分、语义结果标签、审批阻塞项、最弱维度,以及该审查是自审还是独立审查。验证器通过仅证明结构一致性;它不证明产品判断、运行时行为、研究真值、用户价值或审批。
+修复每个错误 → 重跑验证器直到 0 错误；审阅每个警告。
 
-对于实质性工作,当环境支持时,对目标产品与一个不同形态的产品使用全新上下文审查。传入原始证据与用户请求,而不是预期答案。如实标注未运行、被阻塞或条件性评估。
+### 4 视角独立只读评审矩阵（硬流程，交付前必做）
+
+验证器 0 错误后，**必须**运行 4 视角独立只读评审矩阵（详细 brief 见 [references/quality-rubric.md](references/quality-rubric.md)）：
+1. **诉求覆盖度评审**：核对用户全部诉求、关键决策与目标/非目标完整落位，无编号断链；
+2. **跨文档一致性评审**：核对元数据、需求映射双向对应、门禁/阈值/天数（如「连续 N 天」）口径吻合（单文档请求时退化为文档内一致性）；
+3. **现状事实一致性评审**：抽查现状数字/事实与真实证据源吻合，证据状态合规，存量增量清晰；
+4. **双视角可读性评审**：产品经理视角（功能边界清晰、一句话主句 ≤2 句）+ 业务负责人视角（3 分钟四问测试、标题达意、段落 ≤5 句无修饰空话）。
+
+每个视角独立产出「发现分级表」，对发现项进行 Triage 处理：
+- **阻塞项（必改）**：破坏契约规则、事实矛盾、口径冲突、遗漏决策，必须在此轮全部修复并通过复验；
+- **建议项（修复或显式排除）**：可就手修复，或在交付报告中显式说明排除理由。
+
+所有阻塞项清零且建议项 triage 完毕后，才可结束并交付。验证器通过仅证明结构一致性;评审矩阵保证内容品质。验证器通过不代表审批，审批只能由具备授权的决策人作出。
 
 ## 发布元数据
 
