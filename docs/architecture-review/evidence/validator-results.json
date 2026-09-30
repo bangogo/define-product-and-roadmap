@@ -1,0 +1,150 @@
+{
+  "baseline_tag": "v4.1.0",
+  "baseline_commit": "29cf020572aa613d01daa617b31bc88b9f64b27f",
+  "template_sha256": "59ae323ee75cc9960952299fa259d0ddfba168948db2c8e29e44ce795ebf627e",
+  "proof_boundary": "synthetic validator probes; not product execution or user approval",
+  "results": [
+    {
+      "id": "baseline",
+      "expectation": "accepted",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "no-requirements",
+      "expectation": "rejected: a full PRD needs requirements",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 0
+    },
+    {
+      "id": "empty-requirement",
+      "expectation": "rejected: requirement needs content and acceptance",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "invalid-product-shape",
+      "expectation": "rejected: unknown closed-enum value",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "missing-flow-metadata",
+      "expectation": "rejected: diagram still exists but has no flow contract",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "rule-phrase-only-in-attribute",
+      "expectation": "rejected: phrase is absent from target rule text",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "final-still-needs-modification",
+      "expectation": "rejected: requested changes have not been applied or re-reviewed",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "final-readiness-is-no",
+      "expectation": "rejected: final status contradicts visible readiness=no",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "malformed-choice-type",
+      "expectation": "structured rejection, not exception",
+      "observed": "exception",
+      "exception_type": "TypeError",
+      "message": "unhashable type: 'list'"
+    },
+    {
+      "id": "nested-decision-layout",
+      "expectation": "accepted: empty layout wrapper must not end the decision card",
+      "observed": "rejected",
+      "errors": [
+        "决定 D-01 必须提供确认／修改／暂缓三个选项",
+        "决定 D-01 必须提供至少一个稳定方向选项",
+        "决定 D-01 必须有且仅有一个修改说明输入"
+      ],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "invented-old-object",
+      "expectation": "needs baseline comparison; current API has no baseline input",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "cross-format-base",
+      "expectation": "accepted",
+      "observed": "accepted",
+      "errors": [],
+      "warnings": [
+        "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+      ],
+      "requirement_count": 1
+    },
+    {
+      "id": "incomplete-duplicate-roadmap",
+      "expectation": "rejected: version mismatch, incomplete contract and duplicate allocation",
+      "returncode": 0,
+      "observed": {
+        "status": "pass",
+        "prd_html": "<temporary>/cross-format-base.html",
+        "roadmap": "<temporary>/roadmap.md",
+        "errors": [],
+        "warnings": [
+          "静态校验不证明 SVG 几何、桌面／窄屏／打印渲染或用户最终确认"
+        ],
+        "proof_boundary": "html_structure_and_record_matching_only"
+      }
+    },
+    {
+      "id": "standalone-markdown-entry",
+      "expectation": "independent validation entry exists",
+      "returncode": 2,
+      "stderr": "usage: validate_product_docs.py [-h] (--prd PRD | --prd-html PRD_HTML)\n                                [--roadmap ROADMAP] [--decisions DECISIONS]\n                                [--allow-open-questions]\n                                [--format {text,json}]\nvalidate_product_docs.py: error: --prd 旧 Markdown 模式需要 --roadmap\n"
+    }
+  ]
+}

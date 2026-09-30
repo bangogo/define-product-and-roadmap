@@ -1,0 +1,19 @@
+{
+  "document_id": "example-prd",
+  "version": "1.0.0-draft.1",
+  "review_id": "review-001",
+  "content_fingerprint": "sha256:03526caca303617c6cde4ea7489276342dfe22ff9e993225e15dc633f4a5e90a",
+  "decisions": [
+    {
+      "decision_id": "D-01",
+      "source": "web-export",
+      "direction": "user-review",
+      "choice": "user-review",
+      "note": ""
+    }
+  ],
+  "review_confirmation": {
+    "content": true,
+    "visual": true
+  }
+}

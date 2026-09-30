@@ -1,0 +1,31 @@
+{
+  "template_sha256": "59ae323ee75cc9960952299fa259d0ddfba168948db2c8e29e44ce795ebf627e",
+  "results": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "chosenDirection": "user-review",
+      "chosenChoice": "确认",
+      "downloadedDirection": "user-review",
+      "downloadedChoice": "user-review",
+      "matchesUserChoice": false,
+      "screenshot": "template-1440.png",
+      "proof_boundary": "Synthetic browser actions, never user approval"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "chosenDirection": "user-review",
+      "chosenChoice": "确认",
+      "downloadedDirection": "user-review",
+      "downloadedChoice": "user-review",
+      "matchesUserChoice": false,
+      "screenshot": "template-390.png",
+      "proof_boundary": "Synthetic browser actions, never user approval"
+    }
+  ]
+}
