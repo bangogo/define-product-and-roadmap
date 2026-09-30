@@ -33,8 +33,9 @@ async function run(cards) {
 }
 
 function card(id='D-01') {
-  const state = {choice:'', note:''};
+  const state = {choice:'', direction:'', note:''};
   return {dataset:{decisionId:id}, state, querySelector(selector) {
+    if (selector.startsWith('input') && selector.includes('-direction')) return state.direction ? {value:state.direction} : null;
     if (selector.startsWith('input')) return state.choice ? {value:state.choice} : null;
     if (selector === 'textarea') return {value:state.note};
     return null;
@@ -44,6 +45,7 @@ function card(id='D-01') {
 const c = card();
 const one = await run([c]);
 assert.equal(one.blobs.length, 0, 'initial blank choice blocks export');
+c.state.direction = 'user-review';
 c.state.choice = '修改';
 one.events.export();
 assert.equal(one.blobs.length, 0, 'modification without note blocks export');
@@ -51,13 +53,21 @@ c.state.note = '保留人工复核';
 one.events.export();
 assert.equal(one.blobs.length, 1, 'valid modification exports');
 const exported = JSON.parse(await one.blobs[0].blob.text());
-assert.equal(exported.decisions[0].decision_id, 'D-01');
-assert.equal(exported.decisions[0].source, 'web-export');
+assert.equal(exported.decisions[0].direction, 'user-review');
+assert.equal(exported.decisions[0].choice, '修改');
 assert.equal(exported.decisions[0].note, '保留人工复核');
-assert.equal(exported.review_confirmation.content, false);
-assert.match(one.status.textContent, /保持审阅稿/);
 
 c.state.choice = '确认'; c.state.note = '';
+one.events.export();
+assert.equal(one.blobs.length, 2, 'direction-bound confirmation exports');
+assert.equal(JSON.parse(await one.blobs.at(-1).blob.text()).decisions[0].direction, 'user-review');
+
+c.state.direction = '';
+one.events.export();
+assert.equal(one.blobs.length, 2, 'confirmation without direction blocks export');
+c.state.direction = 'user-review';
+assert.match(one.status.textContent, /请先选择方向/);
+
 one.content.checked = true; one.visual.checked = true;
 one.events.export();
 const completed = JSON.parse(await one.blobs.at(-1).blob.text());
@@ -67,4 +77,4 @@ assert.match(one.status.textContent, /核对当前源稿指纹/);
 const zero = await run([]);
 assert.equal(zero.blobs.length, 1, 'no pending card still has version-level export');
 assert.equal(JSON.parse(await zero.blobs[0].blob.text()).decisions.length, 0);
-console.log('interaction smoke: blank, modify, export, version confirmation, no-pending passed');
+console.log('interaction smoke: two-step direction, blank, modify, export, version confirmation, no-pending passed');

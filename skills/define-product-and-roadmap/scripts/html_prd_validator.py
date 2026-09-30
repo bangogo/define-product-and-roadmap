@@ -18,6 +18,10 @@ REQUIRED_METADATA = (
     "文档状态", "是否具备审批条件",
 )
 CHOICES = {"确认", "修改", "暂缓"}
+DOCUMENT_KINDS = {"new", "revision", "rewrite", "audit"}
+MIGRATION_HEADERS = ("旧对象", "旧位置/ID", "新位置/ID", "处理方式", "语义变化", "信息损失说明", "关联验收")
+MIGRATION_DISPOSITIONS = {"保留", "改写", "压缩", "下沉", "删除", "待确认"}
+FAILURE_NODE_KINDS = {"blocked", "attempt", "manual-recovery", "reconciliation"}
 SEMVER = re.compile(r"^v?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$")
 REQ_ID = re.compile(r"^P[0-2]-\d{2,}$")
 DECISION_ID = re.compile(r"^D-\d{2,}$")
@@ -57,6 +61,8 @@ class PRDParser(HTMLParser):
         self.links: List[str] = []
         self.inputs: List[Dict[str, str]] = []
         self.buttons: List[Dict[str, str]] = []
+        self.flow_nodes: Dict[str, Dict[str, str]] = {}
+        self.flow_edges: List[Dict[str, str]] = []
         self.scripts = 0
         self.noscripts = 0
         self._capture: Optional[Tuple[str, Dict[str, str], List[str]]] = None
@@ -64,6 +70,7 @@ class PRDParser(HTMLParser):
         self._active_svg: Optional[Dict[str, object]] = None
         self._active_table: Optional[Dict[str, object]] = None
         self._active_row: Optional[List[str]] = None
+        self._active_row_types: Optional[List[str]] = None
         self._in_nav = 0
         self._in_metadata = 0
 
@@ -99,26 +106,44 @@ class PRDParser(HTMLParser):
             decision_id = a["data-decision-id"]
             self.decision_ids.append(decision_id)
             self._active_decision = decision_id
-            self.decisions.setdefault(decision_id, {"options": set(), "preselected": False})
+            self.decisions.setdefault(decision_id, {
+                "options": set(), "directions": set(), "preselected": False,
+                "direction_preselected": False, "textareas": 0,
+            })
         if tag == "input" and self._active_decision and a.get("type") == "radio":
+            decision = self.decisions[self._active_decision]
             if a.get("name") == self._active_decision:
-                options = self.decisions[self._active_decision]["options"]
+                options = decision["options"]
                 assert isinstance(options, set)
                 options.add(a.get("value", ""))
-            if "checked" in a:
-                self.decisions[self._active_decision]["preselected"] = True
+                if "checked" in a:
+                    decision["preselected"] = True
+            elif a.get("name") == self._active_decision + "-direction":
+                directions = decision["directions"]
+                assert isinstance(directions, set)
+                directions.add(a.get("value", ""))
+                if "checked" in a:
+                    decision["direction_preselected"] = True
+        if tag == "textarea" and self._active_decision:
+            decision = self.decisions[self._active_decision]
+            decision["textareas"] = int(decision["textareas"]) + 1
+        if a.get("data-flow-node"):
+            self.flow_nodes[a["data-flow-node"]] = a
+        if a.get("data-flow-edge"):
+            self.flow_edges.append(a)
         if tag == "svg":
             self._active_svg = {"attrs": a, "title": "", "desc": ""}
             self.svgs.append(self._active_svg)
         if tag in ("title", "desc") and self._active_svg is not None:
             self._capture = ("svg-" + tag, a, [])
         if tag == "table":
-            self._active_table = {"caption": "", "headers": 0, "rows": []}
+            self._active_table = {"attrs": a, "caption": "", "headers": 0, "rows": []}
             self.tables.append(self._active_table)
         if tag == "caption" and self._active_table is not None:
             self._capture = ("caption", a, [])
         if tag == "tr" and self._active_table is not None:
             self._active_row = []
+            self._active_row_types = []
         if tag in ("th", "td") and self._active_row is not None:
             self._capture = (tag, a, [])
         if tag not in ("input", "meta", "link", "br", "hr", "img", "source", "path", "rect", "circle", "line", "polygon", "polyline"):
@@ -147,15 +172,18 @@ class PRDParser(HTMLParser):
                 elif kind == "caption" and self._active_table is not None:
                     self._active_table["caption"] = value
                 elif kind in ("th", "td") and self._active_row is not None:
-                    self._active_row.append(kind)
+                    self._active_row.append(value)
+                    self._active_row_types.append(kind)
                 self._capture = None
         if tag == "tr" and self._active_table is not None and self._active_row is not None:
+            assert self._active_row_types is not None
             rows = self._active_table["rows"]
             assert isinstance(rows, list)
-            rows.append(self._active_row)
-            if any(cell == "th" for cell in self._active_row):
-                self._active_table["headers"] = max(int(self._active_table["headers"]), len(self._active_row))
+            rows.append({"types": self._active_row_types, "cells": self._active_row})
+            if any(cell == "th" for cell in self._active_row_types):
+                self._active_table["headers"] = max(int(self._active_table["headers"]), len(self._active_row_types))
             self._active_row = None
+            self._active_row_types = None
         if tag == "table":
             self._active_table = None
         if tag == "svg":
@@ -199,9 +227,11 @@ def validate_html_prd(path: Path, decisions_path: Optional[Path] = None) -> Tupl
     h1 = [heading for heading in parser.headings if heading[0] == "h1"]
     if len(h1) != 1 or not h1[0][2]:
         errors.append("须有一个非空 h1")
-    for field in ("data-document-id", "data-version", "data-review-id", "data-status", "data-content-fingerprint"):
+    for field in ("data-document-id", "data-version", "data-review-id", "data-status", "data-content-fingerprint", "data-document-kind"):
         if not parser.main.get(field):
             errors.append(f"main 缺少 {field}")
+    if parser.main.get("data-document-kind") not in DOCUMENT_KINDS:
+        errors.append("main data-document-kind 只能是 new／revision／rewrite／audit")
     if expected_fingerprint and parser.main.get("data-content-fingerprint") != expected_fingerprint:
         errors.append("内容指纹与当前 HTML 源稿不匹配；修改后须重新盖章并确认")
     if parser.main.get("data-version") and not SEMVER.fullmatch(parser.main["data-version"]):
@@ -251,8 +281,14 @@ def validate_html_prd(path: Path, decisions_path: Optional[Path] = None) -> Tupl
     for key, card in parser.decisions.items():
         if card["options"] != CHOICES:
             errors.append(f"决定 {key} 必须提供确认／修改／暂缓三个选项")
+        if not card["directions"]:
+            errors.append(f"决定 {key} 必须提供至少一个稳定方向选项")
+        if card["textareas"] != 1:
+            errors.append(f"决定 {key} 必须有且仅有一个修改说明输入")
         if card["preselected"]:
             errors.append(f"决定 {key} 不得预选")
+        if card["direction_preselected"]:
+            errors.append(f"决定 {key} 方向不得预选")
     for index, svg in enumerate(parser.svgs, 1):
         attrs = svg["attrs"]
         assert isinstance(attrs, dict)
@@ -264,9 +300,11 @@ def validate_html_prd(path: Path, decisions_path: Optional[Path] = None) -> Tupl
     for index, table in enumerate(parser.tables, 1):
         rows = table["rows"]
         assert isinstance(rows, list)
-        widths = [len(row) for row in rows]
+        widths = [len(row["cells"]) for row in rows]
         if not table["caption"] or not table["headers"] or len(rows) < 2 or not widths or len(set(widths)) != 1:
             errors.append(f"表格 {index} 须有 caption、表头、数据行及一致列数")
+    errors.extend(validate_migration_table(parser))
+    errors.extend(validate_svg_flow_semantics(parser, document))
     if decisions_path is not None:
         errors.extend(validate_decisions(parser, decisions_path))
     if parser.main.get("data-status") == "最终版" and decisions_path is None:
@@ -298,10 +336,19 @@ def validate_decisions(parser: PRDParser, path: Path) -> List[str]:
         if item.get("source") not in ("web-export", "conversation"):
             errors.append(f"决定 {item.get('decision_id')} 缺少有效来源")
         choice = item.get("choice")
+        direction = item.get("direction")
+        declared_directions = parser.decisions.get(str(item.get("decision_id", "")), {}).get("directions", set())
         if choice not in CHOICES:
             errors.append(f"决定 {item.get('decision_id')} 未明确选择")
         elif choice == "修改" and not str(item.get("note", "")).strip():
             errors.append(f"决定 {item.get('decision_id')} 选择修改但没有具体说明")
+        if choice in ("确认", "修改"):
+            if not direction:
+                errors.append(f"决定 {item.get('decision_id')} 选择{choice}但缺少方向")
+            elif direction not in declared_directions:
+                errors.append(f"决定 {item.get('decision_id')} 的方向未在 HTML 中声明")
+        elif choice == "暂缓" and direction and direction not in declared_directions:
+            errors.append(f"决定 {item.get('decision_id')} 的方向未在 HTML 中声明")
         elif choice == "暂缓" and parser.main.get("data-status") == "最终版":
             errors.append(f"决定 {item.get('decision_id')} 暂缓，不能标最终版")
     confirmation = record.get("review_confirmation")
@@ -309,4 +356,90 @@ def validate_decisions(parser: PRDParser, path: Path) -> List[str]:
         errors.append("决定记录缺少明确的内容与视觉版本级确认")
     elif parser.main.get("data-status") == "最终版" and not (confirmation["content"] and confirmation["visual"]):
         errors.append("最终版需要用户对确切修订的内容和视觉均明确确认")
+    return errors
+
+
+def validate_migration_table(parser: PRDParser) -> List[str]:
+    errors: List[str] = []
+    kind = parser.main.get("data-document-kind")
+    tables = [table for table in parser.tables if table["attrs"].get("data-migration-table") == "v1"]
+    if kind in ("revision", "rewrite") and not tables:
+        return ["修订／重写 HTML 必须包含 data-migration-table=\"v1\" 的逐项迁移核对表"]
+    if kind in ("new", "audit") and tables:
+        errors.append("新建／审计 HTML 不应携带迁移核对表")
+    known = set(parser.ids)
+    requirement_ids = set(parser.requirements)
+    for table_index, table in enumerate(tables, 1):
+        rows = table["rows"]
+        assert isinstance(rows, list)
+        if not rows:
+            errors.append(f"迁移表 {table_index} 缺少行")
+            continue
+        headers = tuple(rows[0]["cells"])
+        if headers != MIGRATION_HEADERS:
+            errors.append(f"迁移表 {table_index} 表头必须固定为：{'／'.join(MIGRATION_HEADERS)}")
+            continue
+        old_ids: List[str] = []
+        new_targets: List[str] = []
+        for row_index, row in enumerate(rows[1:], 2):
+            cells = row["cells"]
+            if len(cells) != len(MIGRATION_HEADERS) or any(not str(cell).strip() for cell in cells):
+                errors.append(f"迁移表 {table_index} 第 {row_index} 行字段缺失")
+                continue
+            old_object, old_id, new_id, disposition, semantic_change, information_loss, acceptance = cells
+            old_ids.append(old_id)
+            new_targets.append(new_id)
+            if disposition not in MIGRATION_DISPOSITIONS:
+                errors.append(f"迁移表 {table_index} 第 {row_index} 行处理方式无效：{disposition}")
+            if disposition == "删除":
+                if new_id != "无":
+                    errors.append(f"迁移表 {table_index} 第 {row_index} 行删除项的新位置只能为“无”")
+                if acceptance != "无":
+                    errors.append(f"迁移表 {table_index} 第 {row_index} 行删除项的关联验收只能为“无”")
+            else:
+                for label, value in (("新位置", new_id), ("关联验收", acceptance)):
+                    if value.startswith("#") and value[1:] not in known:
+                        errors.append(f"迁移表 {table_index} 第 {row_index} 行{label}锚点不存在：{value}")
+                    elif not value.startswith("#"):
+                        errors.append(f"迁移表 {table_index} 第 {row_index} 行{label}必须为锚点")
+            if semantic_change == "无" and disposition != "保留":
+                errors.append(f"迁移表 {table_index} 第 {row_index} 行非保留项必须说明语义变化")
+            if information_loss == "无" and disposition in ("压缩", "下沉"):
+                errors.append(f"迁移表 {table_index} 第 {row_index} 行{disposition}项必须说明信息损失")
+        duplicate_old_ids = sorted(key for key, count in Counter(old_ids).items() if count > 1)
+        if duplicate_old_ids:
+            errors.append(f"迁移表 {table_index} 旧位置/ID 重复：{duplicate_old_ids}")
+        mapped_requirement_ids = {value[1:] for value in new_targets if value.startswith("#req-")}
+        missing_requirements = sorted(
+            requirement_id for requirement_id in requirement_ids
+            if f"req-{requirement_id.lower()}" not in mapped_requirement_ids
+        )
+        if missing_requirements:
+            errors.append(f"迁移表 {table_index} 未覆盖当前需求 ID：{missing_requirements}")
+    return errors
+
+
+def validate_svg_flow_semantics(parser: PRDParser, document: str) -> List[str]:
+    errors: List[str] = []
+    known = set(parser.ids)
+    for index, edge in enumerate(parser.flow_edges, 1):
+        edge_id = edge.get("data-flow-edge", "")
+        source = edge.get("data-from", "")
+        target = edge.get("data-to", "")
+        if not edge_id or not source or not target:
+            errors.append(f"SVG 流程边 {index} 缺少 data-flow-edge／data-from／data-to")
+            continue
+        if source not in parser.flow_nodes or target not in parser.flow_nodes:
+            errors.append(f"SVG 流程边 {edge_id} 的起点或终点节点未声明")
+            continue
+        if edge.get("data-kind") == "failure":
+            target_kind = parser.flow_nodes[target].get("data-node-kind", "")
+            if target_kind not in FAILURE_NODE_KINDS:
+                errors.append(f"SVG 失败边 {edge_id} 必须指向独立失败／恢复节点")
+            rule = edge.get("data-rule", "")
+            phrase = edge.get("data-rule-phrase", "")
+            if not rule or not rule.startswith("#") or rule[1:] not in known:
+                errors.append(f"SVG 失败边 {edge_id} 缺少有效正文规则锚点")
+            if not phrase or phrase not in document:
+                errors.append(f"SVG 失败边 {edge_id} 的规则短语未出现在正文中")
     return errors

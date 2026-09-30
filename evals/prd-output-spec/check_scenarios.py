@@ -33,7 +33,8 @@ def main() -> None:
     assert '当班负责人确认结案' in versions[2]
     assert not list(HERE.glob('*roadmap*')), 'standalone PRD regression must not generate a Roadmap'
     negative = HERE / 'visual-overflow-negative.html'
-    validate(negative)  # Deliberately demonstrates static geometry blind spot.
+    result = subprocess.run([sys.executable, str(VALIDATOR), '--prd-html', str(negative)], capture_output=True, text=True)
+    assert result.returncode == 0, f'{negative.name}: {result.stdout}\n{result.stderr}'  # Static geometry blind spot.
     print('scenario fixtures: new HTML, 3 B revisions, unique rule, table/SVG sync, static visual blind spot passed')
 
 

@@ -10,7 +10,7 @@
 |---|---|---|---|
 | P-01：R1 | §3 P-01：产品目标、流程先于推导和低频信息 | `SKILL.md`、`references/prd-contract.md`、HTML 模板目录 | C1 模板含目标、证据、流程和需求目录；静态通过。案例章节语义只读复核见 C4，非用户可读性批准。 |
 | P-02：R1；R4/R5 E-01 | §3 P-02：标题统摄、重大重排先迁移 | `SKILL.md` 重写流程、`prd-contract.md` 结构契约、迁移清单 | C3 合成迁移表覆盖旧资产；C4 对 draft.5→draft.6 做只读章节复核。静态/桌面呈现以外的可读性未验证。 |
-| P-03：R5 E-02/E-03；R4 E-04/E-05；R6 | §3 P-03：新增输入唯一落位、改原规则并同步引用、语义去重 | `SKILL.md`、`references/html-prd-workflow.md`、`evals/prd-output-spec/inputs-and-migration.md` | C2 三个合成版本核对同一规则、表格列与 SVG/正文同步；脚本场景检查通过。模型真实生成能力未测试。 |
+| P-03：R5 E-02/E-03；R4 E-04/E-05；R6 | §3 P-03：新增输入唯一落位、改原规则并同步引用、语义去重 | `SKILL.md`、`references/html-prd-workflow.md`、HTML 迁移表校验 | C2 三个合成版本核对同一规则、表格列与 SVG/正文同步；修订稿内嵌迁移表并通过脚本检查。模型真实生成能力未测试。 |
 | P-04：R1 | §3 P-04：重写前逐项盘点旧资产，重要删除先确认 | `SKILL.md`、HTML 工作流、输入与迁移记录 | C3 合成旧章节、图、表、需求、决定卡和链接均列去向；仅证明本样本清单完整。 |
 | P-05：R1/R2 | §3 P-05：PRD 与交付规范分工并互引 | `references/prd-contract.md`、`references/roadmap-contract.md`、`validate_product_docs.py` | C8 配套文件核对列入计划；尚无自动语义断言或独立审查结论，部分验收。 |
 | P-06：R1/R2 | §2.1、§3 P-06：清理须有用户请求/授权并先比较与迁移 | `SKILL.md`、`prd-contract.md` | 规则审阅确认默认不清理；C8 未执行真实清理操作（本轮无清理授权），按规则边界验收。 |
@@ -24,10 +24,10 @@
 | P-14：R1 | §2.2、§3 P-14：事实、要求、候选、待确认和效果分开 | `SKILL.md`、`prd-contract.md`、`intent-and-scenario-contract.md` | C7 合成内容保留“仅有文档/尚未验证”标签；案例候选能力与运行证据复核为部分语义证据。 |
 | P-15：R1 | §3 P-15：交付确认、修订确认、发布状态分开 | `prd-contract.md`、HTML 模板版本确认区、校验器 | C4 案例自行发布边界做源稿复核；静态规则存在，未发生外部发布或真实审批。 |
 | P-16：R2 | §3 P-16：主流程覆盖关键分支、权限、返工、失败恢复与回流 | `SKILL.md`、`prd-contract.md`、HTML 模板 SVG/文字路径 | C2 样本检查失败补充路径及责任；只覆盖合成案例，不替代真实场景走查。 |
-| P-17：R3 E-06；R4 E-04/E-05；R6 | §3 P-17：内容容纳、阅读顺序、桌面/390px/打印渲染 | `references/html-prd-workflow.md`、模板 CSS、视觉负例 fixture | C5 静态校验接受越界 SVG 负例，证明几何限制；浏览器拒绝 `file://` 后未使用替代入口，桌面/窄屏/打印均未验证。 |
+| P-17：R3 E-06；R4 E-04/E-05；R6 | §3 P-17：内容容纳、阅读顺序、桌面/390px/打印渲染 | `references/html-prd-workflow.md`、模板 CSS、视觉负例 fixture、隔离实战样本 | C5 静态校验接受越界 SVG 负例，证明几何限制；4.1.0 隔离实战样本已通过本地 HTTP 捕获桌面/390px/打印与真实点击证据。 |
 | P-18：R3 | §3 P-18：Agent 产品映射能力、工具、宿主、降级、人工确认与证据 | `prd-contract.md`、`quality-rubric.md` | C7 只做案例候选能力/宿主证据语义审阅；没有真实宿主调用轨迹，部分验收。 |
 | P-19：R3 | §3 P-19：开源候选关联能力、来源、许可与验证状态 | `prd-contract.md`、`quality-rubric.md` | C7 检查候选项不应写为已集成；本轮没有开展新的开源调研或许可审查，部分验收。 |
-| P-20：R2 | §4：逐项决定卡、空选择、修改意见、来源与版本指纹绑定 | `html-prd-workflow.md`、HTML 模板、`html_prd_validator.py`、`stamp_html_prd.py` | C6：8 个 Python 正反例通过；Node 交互冒烟覆盖空选、缺意见、导出、确认及无待决项。真实浏览器导出未验证。 |
+| P-20：R2 | §4：逐项决定卡、空选择、修改意见、来源与版本指纹绑定 | `html-prd-workflow.md`、HTML 模板、`html_prd_validator.py`、`stamp_html_prd.py` | C6：11 个 Python 正反例通过；Node 冒烟覆盖两步方向、空选、缺方向、缺意见、导出、版本确认及无待决项。真实浏览器导出未验证。 |
 | P-21：R2 | §5：静态、语义、实际渲染、用户确认、运行效果分层 | `SKILL.md`、`quality-rubric.md`、验证报告 | C5/C7/C9 分层记录；旧契约、HTML 和案例静态检查通过。视觉与真实宿主证据未验证。 |
 | P-22：R3 E-06；R5 E-07/E-01；R4 E-04/E-08；R6 | §1.1、§3 P-22、§4：默认单份 HTML，按信息关系选择 SVG/表格/短文，保留明确格式要求 | `SKILL.md`、`prd-contract.md`、HTML 工作流/模板、兼容校验入口 | C1 单份 HTML 可独立校验；C2 图表与表格合成样本通过；C9 72 个旧契约测试及 Markdown PRD+Roadmap CLI 回归通过。实际视觉仍未验证。 |
 

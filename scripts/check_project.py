@@ -195,6 +195,22 @@ def check_evals(errors: List[str]) -> None:
         fail(errors, f"评估清单过小:{counts}")
 
 
+def check_document_links(errors: List[str]) -> None:
+    """Check local Markdown links in maintained project and acceptance documents."""
+    paths = [ROOT / "README.md"] + sorted((ROOT / "evals" / "prd-output-spec").glob("*.md"))
+    for path in paths:
+        text = read_or_fail(path, errors)
+        if text is None:
+            continue
+        for number, line in enumerate(text.splitlines(), 1):
+            for target in LINK_RE.findall(line):
+                if target.startswith(("http://", "https://", "#")):
+                    continue
+                relative = Path(target.split("#", 1)[0])
+                if not relative.anchor and not (path.parent / relative).resolve().exists():
+                    fail(errors, f"{path.relative_to(ROOT)}:{number}:链接失效:{target}")
+
+
 def run_command(command: List[str], errors: List[str], label: str) -> None:
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
     if result.returncode:
@@ -256,6 +272,7 @@ def main() -> int:
     version = check_versions(errors)
     check_discovery_links(errors)
     check_evals(errors)
+    check_document_links(errors)
 
     run_command([sys.executable, str(SKILL / "scripts" / "test_contract.py"), "-q"], errors, "契约测试")
     run_command([sys.executable, str(SKILL / "scripts" / "test_html_contract.py"), "-q"], errors, "HTML PRD 契约测试")

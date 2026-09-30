@@ -32,6 +32,8 @@ def build(revision: int) -> None:
                         '用例输入称团队已使用人工工单登记表，未提供系统调用日志；系统自动流转仍未验证。')
     text = text.replace('用户提交材料，系统生成可审阅草稿，用户确认后进入下一步。',
                         '处理人员提交工单，系统展示待核对结果，负责人确认后结案；证据不足时返回补充。')
+    text = text.replace('文字路径：提交材料 → 获得草稿 → 用户确认；信息不足时先进入“保留待补材料”，用户补充后再提交。',
+                        '文字路径：提交工单 → 处理并记录结果 → 负责人确认结案；信息不足时先保留待补材料，用户补充后再提交。')
     text = text.replace('用户提交材料', '提交工单')
     text = text.replace('生成审阅草稿', '处理工单')
     text = text.replace('用户确认结果', '负责人确认')
@@ -47,13 +49,17 @@ def build(revision: int) -> None:
     text = text.replace('确认草稿的责任边界', '决定是否允许自动结案')
     text = text.replace('背景：草稿可预览，但是否直接用于后续步骤仍待决定。当前证据：只有方案，尚无真实用户效果。拟落位：需求规则与验收。',
                         '背景：人工登记表据称需负责人确认。当前证据：合成用户陈述，系统自动流转未验证。拟落位：需求规则与验收。')
-    text = text.replace('方向 A（建议）：用户确认后放行；增加一次审阅，但可发现内容问题。', '方向 A（建议）：保持负责人确认；增加一次复核，可防止误结案。')
-    text = text.replace('方向 B：自动放行；减少确认步骤，需新增质量与授权控制。', '方向 B：自动结案；减少等待，但需授权、误关恢复与运行验证。')
+    text = text.replace('value="user-review">方向 A：用户确认后放行（建议）', 'value="manual-close">方向 A：保持负责人确认（建议）')
+    text = text.replace('value="auto-release">方向 B：自动放行', 'value="auto-close">方向 B：自动结案')
     if revision >= 2:
+        text = text.replace('data-document-kind="new"', 'data-document-kind="revision"')
         text = text.replace('工单关闭前需负责人确认。', '工单关闭前需附处理证据并由负责人确认。')
         text = text.replace('处理人员能看到处理结果、当前责任人和缺口；', '处理人员能看到处理结果、处理证据、当前责任人和缺口；')
         text = text.replace('<th scope="col">证据</th></tr></thead><tbody><tr><td>人工工单登记</td><td>尚未验证</td><td>合成用户陈述；未做宿主调用</td>',
                             '<th scope="col">证据</th><th scope="col">处理证据</th></tr></thead><tbody><tr><td>人工工单登记</td><td>尚未验证</td><td>合成用户陈述；未做宿主调用</td><td>结案前补齐</td>')
+        migration = '''<section><h2 id="migration">迁移核对表</h2><div class="table-scroll"><table data-migration-table="v1"><caption>draft.1 到 draft.2 迁移核对</caption><thead><tr><th>旧对象</th><th>旧位置/ID</th><th>新位置/ID</th><th>处理方式</th><th>语义变化</th><th>信息损失说明</th><th>关联验收</th></tr></thead><tbody><tr><td>需求</td><td>P0-01@draft.1</td><td><a href="#req-p0-01">#req-p0-01</a></td><td>改写</td><td>新增处理证据</td><td>无</td><td><a href="#req-p0-01">#req-p0-01</a></td></tr></tbody></table></div></section>'''
+        text = text.replace('  <section><h2 id="risks">风险与待确认</h2>', migration + '\n  <section><h2 id="risks">风险与待确认</h2>')
+        text = text.replace('<li><a href="#risks">风险与待确认</a></li>', '<li><a href="#risks">风险与待确认</a></li><li><a href="#migration">迁移核对表</a></li>')
     if revision >= 3:
         text = text.replace('工单关闭前需附处理证据并由负责人确认。', '工单关闭前需附处理证据并由当班负责人确认。')
         text = text.replace('负责人确认结案', '当班负责人确认结案')
@@ -61,6 +67,8 @@ def build(revision: int) -> None:
         text = text.replace('负责人确认后状态变为已结案。', '当班负责人确认后状态变为已结案。')
         text = text.replace('<th scope="col">处理证据</th></tr></thead><tbody><tr><td>人工工单登记</td><td>尚未验证</td><td>合成用户陈述；未做宿主调用</td><td>结案前补齐</td>',
                             '<th scope="col">处理证据</th><th scope="col">确认责任</th></tr></thead><tbody><tr><td>人工工单登记</td><td>尚未验证</td><td>合成用户陈述；未做宿主调用</td><td>结案前补齐</td><td>当班负责人</td>')
+        text = text.replace('<caption>draft.1 到 draft.2 迁移核对</caption>', f'<caption>draft.1 到 draft.{revision} 迁移核对</caption>')
+        text = text.replace('<td>新增处理证据</td>', '<td>新增处理证据并改由当班负责人确认</td>')
     text = text.replace('review-001', f'review-{revision:03d}')
     path = OUT / f'existing-prd-draft.{revision}.html'
     path.write_text(text, encoding='utf-8')

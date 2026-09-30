@@ -27,7 +27,7 @@
   </style>
 </head>
 <body>
-<main data-document-id="example-prd" data-version="4.0.0-draft.1" data-review-id="review-001" data-status="审阅稿" data-content-fingerprint="sha256:2537aa9c5187ad6aba229623edcd7140646bcd06e56a4211a0674789d1b0252f">
+<main data-document-id="example-prd" data-version="4.0.0-draft.1" data-review-id="review-001" data-status="审阅稿" data-document-kind="new" data-content-fingerprint="sha256:ed1f7ec9b7d949e095867e2ee8ff553560a8d36c72df08fde567e931d42408f2">
   <h1>示例产品需求文档</h1>
   <dl class="metadata">
     <dt>文档版本</dt><dd>4.0.0-draft.1</dd>
@@ -79,7 +79,7 @@
     <section class="decision" id="decision-d-01" data-decision-id="D-01"><h3>确认草稿的责任边界</h3>
       <p>背景：草稿可预览，但是否直接用于后续步骤仍待决定。当前证据：只有方案，尚无真实用户效果。拟落位：需求规则与验收。</p>
       <ul><li>方向 A（建议）：用户确认后放行；增加一次审阅，但可发现内容问题。</li><li>方向 B：自动放行；减少确认步骤，需新增质量与授权控制。</li></ul>
-      <label><input type="radio" name="D-01" value="确认">确认</label>
+      <label><input type="radio" name="D-01-direction" value="user-review">方向 A</label><label><input type="radio" name="D-01-direction" value="auto-release">方向 B</label><label><input type="radio" name="D-01" value="确认">确认</label>
       <label><input type="radio" name="D-01" value="修改">修改</label>
       <label><input type="radio" name="D-01" value="暂缓">暂缓</label>
       <textarea aria-label="D-01 的修改说明" placeholder="选择修改时写明具体变更"></textarea>

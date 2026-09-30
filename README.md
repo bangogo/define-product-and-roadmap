@@ -63,4 +63,4 @@ HTML PRD 源稿修改后，用 `skills/define-product-and-roadmap/scripts/stamp_
 python3 skills/define-product-and-roadmap/scripts/validate_product_docs.py --prd-html <path>
 ```
 
-决定记录使用 `--decisions <path>`。旧 Markdown 入口为 `--prd <PRD.md> --roadmap <Roadmap.md>`。本轮升级的来源、映射和证据边界分别见 [`spec.md`](spec.md)、[`problem.md`](problem.md)、[`acceptance-map.md`](evals/prd-output-spec/acceptance-map.md) 与 [`验证报告`](evals/prd-output-spec/validation-report.md)。`problem.md` 是历史问题及来源索引，不表示 22 项仍是当前缺陷；案例 PRD 状态独立管理。
+决定记录使用 `--decisions <path>`，并须绑定卡片声明的稳定方向 ID。4.1.0 起不采纳 4.0 的无方向确认记录；修订和重写 HTML 内必须提供逐项迁移表。旧 Markdown 入口为 `--prd <PRD.md> --roadmap <Roadmap.md>`。本轮升级的来源、映射和证据边界分别见 [`spec.md`](spec.md)、[`problem.md`](problem.md)、[`acceptance-map.md`](evals/prd-output-spec/acceptance-map.md) 与 [`验证报告`](evals/prd-output-spec/validation-report.md)。`problem.md` 是历史问题及来源索引，不表示 22 项仍是当前缺陷；案例 PRD 状态独立管理。
