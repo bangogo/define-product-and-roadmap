@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>示例产品需求文档 · 审阅稿</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #17232f; background: #f4f6f8; line-height: 1.6; }
+    body { margin: 0; } main { max-width: 1100px; margin: auto; padding: 2rem; background: white; }
+    h1, h2, h3 { line-height: 1.3; } h2 { margin-top: 3rem; border-top: 2px solid #dde5eb; padding-top: 1rem; }
+    .metadata { display: grid; grid-template-columns: max-content 1fr; gap: .2rem 1rem; }
+    .metadata dt { font-weight: 700; } .metadata dd { margin: 0; }
+    .table-scroll, .figure-scroll { overflow-x: auto; max-width: 100%; }
+    table { width: 100%; border-collapse: collapse; min-width: 650px; }
+    caption { text-align: left; font-weight: 700; padding: .5rem 0; }
+    th, td { border: 1px solid #aab9c5; padding: .55rem; vertical-align: top; }
+    th { background: #e9f0f4; } svg { display: block; width: 100%; min-width: 660px; height: auto; }
+    .decision, .requirement { border: 1px solid #b7c8d4; border-radius: .5rem; padding: 1rem; margin: 1.5rem 0; }
+    .decision { background: #f5f9fc; } .decision label { display: inline-block; margin: .2rem 1rem .2rem 0; }
+    .review-confirmation { border: 2px solid #38556b; padding: 1rem; margin-top: 2rem; }
+    .review-confirmation label { display: block; margin: .5rem 0; }
+    button { padding: .65rem 1rem; cursor: pointer; } button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid #146ca8; outline-offset: 2px; }
+    #selection-summary { white-space: pre-wrap; background: #edf3f6; padding: 1rem; }
+    textarea { display: block; width: 100%; min-height: 4rem; box-sizing: border-box; margin: .6rem 0; }
+    @media(max-width: 600px) { main { padding: 1rem; } .metadata { grid-template-columns: 1fr; } .metadata dd { margin-bottom: .5rem; } }
+    @media print { :root { background: white; } main { padding: 0; max-width: none; } .table-scroll, .figure-scroll { overflow: visible; } table { min-width: 0; } svg { min-width: 0; } .decision button { display: none; } }
+  </style>
+</head>
+<body>
+<main data-document-id="example-prd" data-version="1.0.0-draft.1" data-review-id="review-001" data-status="审阅稿" data-content-fingerprint="sha256:72b2e68fd3dee5aa15dd1476913e8bf18c4082b097971f4866ee2f7becb9189a">
+  <h1>示例产品需求文档</h1>
+  <dl class="metadata">
+    <dt>文档版本</dt><dd>1.0.0-draft.1</dd>
+    <dt>证据截止日期</dt><dd>2026-09-29</dd>
+    <dt>产品主形态</dt><dd>内容/产物生产</dd>
+    <dt>次级形态</dt><dd>无</dd>
+    <dt>风险修饰项</dt><dd>AI</dd>
+    <dt>当前证据阶段</dt><dd>仅有文档</dd>
+    <dt>当前交付目的</dt><dd>决策演示</dd>
+    <dt>适用场景</dt><dd>A（0→1 新产品）</dd>
+    <dt>适用产品合同</dt><dd>内容/产物生产、AI</dd>
+    <dt>文档状态</dt><dd>审阅稿</dd>
+    <dt>是否具备审批条件</dt><dd>否（关键决定待确认）</dd>
+  </dl>
+  <nav aria-label="目录"><h2 id="contents">目录</h2><ol>
+    <li><a href="#value">用户目标与交付</a></li>
+    <li><a href="#evidence">用户问题与证据</a></li>
+    <li><a href="#flow">产品方案与流程</a></li>
+    <li><a href="#requirements">需求规则与验收</a></li>
+    <li><a href="#risks">风险与待确认</a></li>
+  </ol></nav>
+  <section><h2 id="value">用户目标与交付</h2><p>示例用户提交主题材料，得到可审阅的内容草稿；此处换成项目真实目标、角色与边界。</p></section>
+  <section><h2 id="evidence">用户问题与证据</h2><p>当前仅有文档，真实使用效果尚未验证。此处记录来源、日期和缺口。</p></section>
+  <section><h2 id="flow">产品方案与流程</h2>
+    <div class="figure-scroll"><svg viewBox="0 0 700 210" role="img" aria-labelledby="flow-title flow-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow-title">示例内容流程</title><desc id="flow-desc">用户提交材料，系统生成可审阅草稿，用户确认后进入下一步；信息不足时返回补充。</desc>
+      <rect x="12" y="35" width="180" height="78" rx="8" fill="#e2f0f7" stroke="#38556b"/>
+      <text x="102" y="80" text-anchor="middle" font-size="18">用户提交材料</text>
+      <path d="M202 74 H250" stroke="#38556b" stroke-width="3"/><path d="M250 74 l-9 -6 v12 z" fill="#38556b"/>
+      <rect x="260" y="35" width="180" height="78" rx="8" fill="#e2f0f7" stroke="#38556b"/>
+      <text x="350" y="80" text-anchor="middle" font-size="18">生成审阅草稿</text>
+      <path d="M450 74 H498" stroke="#38556b" stroke-width="3"/><path d="M498 74 l-9 -6 v12 z" fill="#38556b"/>
+      <rect x="508" y="35" width="180" height="78" rx="8" fill="#e2f0f7" stroke="#38556b"/>
+      <text x="598" y="80" text-anchor="middle" font-size="18">用户确认结果</text>
+      <path d="M598 120 V162 H350 V122" fill="none" stroke="#9b4d3c" stroke-width="2" stroke-dasharray="6 5"/>
+      <path d="M350 118 l-6 10 h12 z" fill="#9b4d3c"/>
+      <text x="475" y="186" text-anchor="middle" font-size="14" fill="#743729">信息不足时返回补充</text>
+    </svg></div>
+    <p>文字路径：提交材料 → 获得草稿 → 用户确认；失败时保留原材料并说明可修改的内容。</p>
+  </section>
+  <section><h2 id="requirements">需求规则与验收</h2>
+    <article class="requirement" id="req-p0-01" data-requirement-id="P0-01"><h3>提交材料并获得草稿</h3>
+      <p>用户提供主题和来源；系统生成带来源提示的草稿。若来源不足，展示缺口并允许补充后重试。</p>
+      <p><strong>验收：</strong>用户能看到草稿、来源和缺口，修改输入后可再次生成。</p>
+    </article>
+    <div class="table-scroll"><table><caption>结果与证据</caption><thead><tr><th scope="col">结果</th><th scope="col">当前状态</th><th scope="col">证据</th></tr></thead><tbody><tr><td>可审阅草稿</td><td>尚未验证</td><td>待真实样本试用</td></tr></tbody></table></div>
+  </section>
+  <section><h2 id="risks">风险与待确认</h2>
+    <section class="decision" id="decision-d-01" data-decision-id="D-01"><h3>确认草稿的责任边界</h3>
+      <p>背景：草稿可预览，但是否直接用于后续步骤仍待决定。当前证据：只有方案，尚无真实用户效果。拟落位：需求规则与验收。</p>
+      <ul><li>方向 A（建议）：用户确认后放行；增加一次审阅，但可发现内容问题。</li><li>方向 B：自动放行；减少确认步骤，需新增质量与授权控制。</li></ul>
+      <label><input type="radio" name="D-01" value="确认">确认</label>
+      <label><input type="radio" name="D-01" value="修改">修改</label>
+      <label><input type="radio" name="D-01" value="暂缓">暂缓</label>
+      <textarea aria-label="D-01 的修改说明" placeholder="选择修改时写明具体变更"></textarea>
+    </section>
+    <section class="review-confirmation" aria-labelledby="review-heading">
+      <h3 id="review-heading">当前审阅稿确认</h3>
+      <p>逐项产品决定与文档版本确认分别记录。请先核对本修订的正文与实际渲染；勾选只表示对当前修订的明确操作，导出后仍需维护者核对和采纳。</p>
+      <label><input id="review-content" type="checkbox"> 我已审阅此版本的内容并明确认可</label>
+      <label><input id="review-visual" type="checkbox"> 我已检查此版本的视觉呈现并明确认可</label>
+    </section>
+    <button type="button" id="show-selections">查看已选内容</button>
+    <button type="button" id="export-decisions">导出决定记录</button>
+    <pre id="selection-summary" aria-live="polite">尚未选择。</pre><p id="export-status" role="status"></p>
+    <noscript><p>此宿主无法运行页面交互时，请在对话中逐项说明每个待决事项的确认、修改或暂缓；修改须给具体意见，并分别说明是否认可当前版本的内容与视觉。维护者在台账中标明决定来自对话，不能标为页面导出。</p></noscript>
+  </section>
+</main>
+<script>
+(() => {
+  const main = document.querySelector('main');
+  const status = document.getElementById('export-status');
+  const collect = () => ({
+    document_id: main.dataset.documentId,
+    version: main.dataset.version,
+    review_id: main.dataset.reviewId,
+    content_fingerprint: main.dataset.contentFingerprint,
+    decisions: [...document.querySelectorAll('[data-decision-id]')].map(card => ({
+      decision_id: card.dataset.decisionId,
+      source: 'web-export',
+      choice: card.querySelector('input[type="radio"]:checked')?.value || '',
+      note: card.querySelector('textarea')?.value.trim() || ''
+    })),
+    review_confirmation: {
+      content: document.getElementById('review-content').checked,
+      visual: document.getElementById('review-visual').checked
+    }
+  });
+  const show = () => {
+    const record = collect();
+    document.getElementById('selection-summary').textContent =
+      record.decisions.map(d => `${d.decision_id}：${d.choice || '未选择'}${d.note ? '；意见：' + d.note : ''}`).join('\n') +
+      `\n内容确认：${record.review_confirmation.content ? '是' : '否'}；视觉确认：${record.review_confirmation.visual ? '是' : '否'}`;
+    return record;
+  };
+  document.getElementById('show-selections').addEventListener('click', show);
+  document.getElementById('export-decisions').addEventListener('click', () => {
+    const record = show();
+    if (record.decisions.some(d => !d.choice || (d.choice === '修改' && !d.note))) {
+      status.textContent = '请逐项选择；选择修改时填写具体意见。'; return;
+    }
+    const blob = new Blob([JSON.stringify(record, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url; link.download = `${record.document_id}-${record.review_id}-decisions.json`;
+    link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    status.textContent = record.decisions.some(d => d.choice === '暂缓') || !record.review_confirmation.content || !record.review_confirmation.visual
+      ? '记录已导出；仍有暂缓项或版本级确认未完成，保持审阅稿。'
+      : '记录已导出；请交维护者核对当前源稿指纹及决定，再判断下一闸门。';
+  });
+})();
+</script>
+</body>
+</html>

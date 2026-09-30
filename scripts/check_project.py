@@ -69,13 +69,18 @@ def check_skill(errors: List[str]) -> None:
         "agents/openai.yaml",
         "references/intent-and-scenario-contract.md",
         "references/prd-contract.md",
+        "references/html-prd-workflow.md",
         "references/roadmap-contract.md",
         "references/revision-lessons.md",
         "references/quality-rubric.md",
         "assets/prd-template.md",
+        "assets/prd-template.html",
         "assets/roadmap-template.md",
         "scripts/validate_product_docs.py",
         "scripts/test_contract.py",
+        "scripts/html_prd_validator.py",
+        "scripts/stamp_html_prd.py",
+        "scripts/test_html_contract.py",
     ]
     for relative in required:
         if not (SKILL / relative).is_file():
@@ -92,7 +97,7 @@ def check_skill(errors: List[str]) -> None:
     description = metadata.get("description", "")
     if not 1 <= len(description) <= 1024:
         fail(errors, f"description 长度超出 1..1024:{len(description)}")
-    if "Do not use" not in description:
+    if "Do not use" not in description and "不用于" not in description:
         fail(errors, "description 缺少负向触发边界(Do not use)")
 
     skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8-sig")
@@ -214,9 +219,22 @@ def verify_dist(version: str, errors: List[str]) -> None:
         fail(errors, f"发布校验和不匹配:expected={expected},actual={actual}")
     with zipfile.ZipFile(archive) as package:
         names = package.namelist()
-        required = f"{SKILL_NAME}/SKILL.md"
-        if required not in names:
-            fail(errors, f"发布归档缺少 {required}")
+        source_files = {
+            f"{SKILL_NAME}/{path.relative_to(SKILL).as_posix()}": path
+            for path in SKILL.rglob("*")
+            if path.is_file()
+            and not any(part in {"__pycache__", ".DS_Store"} for part in path.parts)
+            and path.suffix != ".pyc"
+        }
+        expected_names = set(source_files)
+        actual_names = set(names)
+        for missing in sorted(expected_names - actual_names):
+            fail(errors, f"发布归档缺少源文件:{missing}")
+        for stale in sorted(actual_names - expected_names):
+            fail(errors, f"发布归档含有非当前源文件:{stale}")
+        for name in sorted(expected_names & actual_names):
+            if package.read(name) != source_files[name].read_bytes():
+                fail(errors, f"发布归档内容与当前源码不一致:{name}")
         if any("__pycache__" in name or name.endswith((".pyc", ".DS_Store")) for name in names):
             fail(errors, "发布归档包含被排除的构建文件")
         version_entry = f"{SKILL_NAME}/VERSION"
@@ -240,8 +258,9 @@ def main() -> int:
     check_evals(errors)
 
     run_command([sys.executable, str(SKILL / "scripts" / "test_contract.py"), "-q"], errors, "契约测试")
+    run_command([sys.executable, str(SKILL / "scripts" / "test_html_contract.py"), "-q"], errors, "HTML PRD 契约测试")
     run_command(
-        [sys.executable, "-m", "py_compile", str(SKILL / "scripts" / "validate_product_docs.py"), str(SKILL / "scripts" / "test_contract.py")],
+        [sys.executable, "-m", "py_compile", str(SKILL / "scripts" / "validate_product_docs.py"), str(SKILL / "scripts" / "html_prd_validator.py"), str(SKILL / "scripts" / "stamp_html_prd.py"), str(SKILL / "scripts" / "test_contract.py"), str(SKILL / "scripts" / "test_html_contract.py")],
         errors,
         "Python 编译",
     )
