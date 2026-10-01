@@ -69,13 +69,17 @@ def check_skill(errors: List[str]) -> None:
         "agents/openai.yaml",
         "references/intent-and-scenario-contract.md",
         "references/prd-contract.md",
+        "references/html-prd-workflow.md",
         "references/roadmap-contract.md",
         "references/revision-lessons.md",
         "references/quality-rubric.md",
         "assets/prd-template.md",
+        "assets/prd-template.html",
         "assets/roadmap-template.md",
         "scripts/validate_product_docs.py",
         "scripts/test_contract.py",
+        "scripts/html_prd_validator.py",
+        "scripts/test_html_contract.py",
     ]
     for relative in required:
         if not (SKILL / relative).is_file():
@@ -240,8 +244,9 @@ def main() -> int:
     check_evals(errors)
 
     run_command([sys.executable, str(SKILL / "scripts" / "test_contract.py"), "-q"], errors, "契约测试")
+    run_command([sys.executable, str(SKILL / "scripts" / "test_html_contract.py"), "-q"], errors, "HTML PRD 契约测试")
     run_command(
-        [sys.executable, "-m", "py_compile", str(SKILL / "scripts" / "validate_product_docs.py"), str(SKILL / "scripts" / "test_contract.py")],
+        [sys.executable, "-m", "py_compile", str(SKILL / "scripts" / "validate_product_docs.py"), str(SKILL / "scripts" / "html_prd_validator.py"), str(SKILL / "scripts" / "test_contract.py"), str(SKILL / "scripts" / "test_html_contract.py")],
         errors,
         "Python 编译",
     )

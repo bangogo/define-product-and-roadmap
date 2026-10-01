@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""验证基于证据、感知产品形态与适用场景的 PRD 与 Roadmap Markdown（契约 3.2.0）。
+"""验证 HTML PRD 或旧 Markdown PRD/Roadmap 对（契约 4.0.0）。
 
 要求 Python >= 3.8,零第三方依赖。
 
@@ -25,6 +25,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
+
+from html_prd_validator import validate_html_prd
 
 
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -154,15 +156,23 @@ def issue(area: str, expected: str, actual: str, fix: str) -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--prd", required=True, type=Path)
-    parser.add_argument("--roadmap", required=True, type=Path)
+    prd_input = parser.add_mutually_exclusive_group(required=True)
+    prd_input.add_argument("--prd", type=Path, help="旧 Markdown PRD；需同时提供 --roadmap")
+    prd_input.add_argument("--prd-html", type=Path, help="独立 HTML PRD")
+    parser.add_argument("--roadmap", type=Path, help="Markdown Roadmap；HTML PRD 时可选")
+    parser.add_argument("--decisions", type=Path, help="与 HTML 审阅稿绑定的决定记录 JSON")
     parser.add_argument(
         "--allow-open-questions",
         action="store_true",
         help="将假设登记表之外的 TODO/TBD/[待确认] 作为警告而非错误报告。",
     )
     parser.add_argument("--format", choices=("text", "json"), default="text")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.prd and not args.roadmap:
+        parser.error("--prd 旧 Markdown 模式需要 --roadmap")
+    if args.prd and args.decisions:
+        parser.error("--decisions 只适用于 --prd-html")
+    return args
 
 
 def read_markdown(path: Path, errors: List[str]) -> str:
@@ -1395,6 +1405,38 @@ def main() -> int:
             except (OSError, ValueError):
                 pass
     args = parse_args()
+    if args.prd_html:
+        errors, warnings, parsed = validate_html_prd(args.prd_html, args.decisions)
+        if args.roadmap and parsed:
+            roadmap_errors: List[str] = []
+            roadmap = read_markdown(args.roadmap, roadmap_errors)
+            errors.extend(roadmap_errors)
+            if roadmap:
+                validate_markdown(args.roadmap, roadmap, errors)
+                rm_meta = metadata(roadmap)
+                for field in REQUIRED_METADATA:
+                    if field in parsed.metadata and field in rm_meta and parsed.metadata[field] != rm_meta[field]:
+                        errors.append(f"跨文档元数据不一致：{field}")
+                match = re.search(r"^#{2,4}[^\n]*需求落位映射[^\n]*\n([\s\S]*?)(?=^#{1,4} |\Z)", roadmap, re.MULTILINE)
+                if match:
+                    mapped = set(REQ_PLAIN_RE.findall(match.group(1)))
+                    mapped_ids = {f"P{priority}-{number}" for priority, number in mapped}
+                    if mapped_ids != set(parsed.requirements):
+                        errors.append("Roadmap 需求落位映射与 HTML PRD 需求 ID 不一一对应")
+                else:
+                    errors.append("Roadmap 缺少需求落位映射章节")
+        if args.format == "json":
+            print(json.dumps({"status": "fail" if errors else "pass", "prd_html": str(args.prd_html),
+                              "roadmap": str(args.roadmap) if args.roadmap else None,
+                              "errors": errors, "warnings": warnings,
+                              "proof_boundary": "html_structure_and_record_matching_only"}, ensure_ascii=False, indent=2))
+        else:
+            for warning in warnings:
+                print(f"警告:{warning}", file=sys.stderr)
+            for error in errors:
+                print(f"错误:{error}", file=sys.stderr)
+            print(f"HTML PRD {'验证失败' if errors else '验证通过'}：{len(errors)} 个错误，{len(warnings)} 个警告")
+        return 1 if errors else 0
     errors: List[str] = []
     warnings: List[str] = []
     prd = read_markdown(args.prd, errors)
