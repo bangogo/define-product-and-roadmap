@@ -1,0 +1,84 @@
+{
+  "baseline_tag": "v4.1.0",
+  "baseline_commit": "29cf020572aa613d01daa617b31bc88b9f64b27f",
+  "executed_at": "2026-10-01",
+  "proof_boundary": "These are the pre-upgrade regression tests. They prove current package and contract behavior only; they do not prove semantic quality, real rendering, host execution, or user approval.",
+  "commands": [
+    {
+      "command": "python3 scripts/check_project.py --verify-dist",
+      "status": "pass",
+      "result": "72 legacy contract tests, 11 HTML contract tests, Python compilation, OpenAI quick_validate, and distribution verification passed"
+    },
+    {
+      "command": "python3 skills/define-product-and-roadmap/scripts/test_contract.py",
+      "status": "pass",
+      "tests": 72
+    },
+    {
+      "command": "python3 skills/define-product-and-roadmap/scripts/test_html_contract.py",
+      "status": "pass",
+      "tests": 11
+    },
+    {
+      "command": "python3 evals/prd-output-spec/check_scenarios.py",
+      "status": "pass",
+      "result": "new HTML, 3 revision scenarios, unique rule, table/SVG synchronization, and static visual blind spot checks passed"
+    },
+    {
+      "command": "node evals/prd-output-spec/interaction_smoke.mjs",
+      "status": "pass",
+      "result": "two-step direction, blank choice, modification note, export, version confirmation, and no-pending behavior passed"
+    }
+  ],
+  "capability_groups": [
+    {
+      "group": "Markdown PRD + Roadmap contract",
+      "current_tests": 72,
+      "capabilities": [
+        "metadata consistency and version semantics",
+        "product shape and risk contracts",
+        "requirement IDs, five required elements, priority grouping, and module mapping",
+        "PRD/Roadmap responsibility and one-to-one requirement mapping",
+        "A/B scenario and R0 baseline rules",
+        "evidence status, assumptions, numeric baselines, and open markers",
+        "tables, links, TOC, repetition, archaeology, and presentation warnings"
+      ]
+    },
+    {
+      "group": "HTML PRD contract",
+      "current_tests": 11,
+      "capabilities": [
+        "standalone draft and decision record",
+        "revision migration table",
+        "source edit invalidates old stamp and record",
+        "missing, duplicate, preselected, and invalid decisions",
+        "final status requires explicit review and no deferred decision",
+        "approval-only change keeps content fingerprint",
+        "HTML structure and SVG failure-edge semantics"
+      ]
+    },
+    {
+      "group": "Scenario regression",
+      "current_tests": "check_scenarios.py",
+      "capabilities": [
+        "new HTML PRD",
+        "three incremental revision samples",
+        "single authoritative rule after feedback",
+        "table and SVG synchronization",
+        "explicit static visual blind spot"
+      ]
+    },
+    {
+      "group": "Interaction smoke",
+      "current_tests": "interaction_smoke.mjs",
+      "capabilities": [
+        "two-step direction and choice",
+        "blank choice blocking",
+        "modification note requirement",
+        "valid export",
+        "version-level content and visual confirmation",
+        "no-pending decision export"
+      ]
+    }
+  ]
+}

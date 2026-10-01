@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>define-product-and-roadmap 架构精简升级方案</title>
+  <title>define-product-and-roadmap 升级方案</title>
   <style>
     :root {
       color-scheme: light;
@@ -14,17 +14,17 @@
     }
     body { margin: 0; }
     main { max-width: 1080px; margin: 0 auto; padding: 3rem 1.5rem 5rem; background: #fff; }
-    header { border-bottom: 1px solid #dbe3ea; padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
-    h1, h2, h3, h4 { line-height: 1.3; margin-top: 2.2rem; }
+    header { border-bottom: 1px solid #dbe3ea; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    h1, h2, h3 { line-height: 1.3; margin-top: 2rem; }
     h1 { font-size: 2rem; margin: 0 0 0.5rem; }
-    h2 { font-size: 1.35rem; border-top: 1px solid #dce4ea; padding-top: 1.4rem; }
-    h3 { font-size: 1.1rem; }
+    h2 { font-size: 1.3rem; border-top: 1px solid #dce4ea; padding-top: 1.3rem; }
+    h3 { font-size: 1.08rem; }
     p { margin: 0.6rem 0 1rem; }
     ul, ol { padding-left: 1.4rem; }
     li { margin: 0.35rem 0; }
     table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
     caption { text-align: left; font-weight: 700; padding: 0.5rem 0; }
-    th, td { border: 1px solid #c9d4de; padding: 0.55rem 0.7rem; vertical-align: top; font-size: 0.95rem; }
+    th, td { border: 1px solid #c9d4de; padding: 0.55rem 0.7rem; vertical-align: top; font-size: 0.94rem; }
     th { background: #eef4f8; text-align: left; }
     tr:nth-child(even) td { background: #fafcfd; }
     code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -33,450 +33,288 @@
     pre code { background: transparent; color: inherit; padding: 0; }
     .meta { color: #55616b; font-size: 0.95rem; }
     .callout { border-left: 4px solid #1f6f8b; background: #f2f8fb; padding: 0.8rem 1rem; margin: 1.2rem 0; border-radius: 0 6px 6px 0; }
-    .warning { border-left-color: #b35c00; background: #fff7ed; }
-    .danger { border-left-color: #b42318; background: #fff1f0; }
-    .ok { border-left-color: #1a7f37; background: #f0f9f1; }
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 760px) { .two-col { grid-template-columns: 1fr; } }
     .box { border: 1px solid #c9d4de; border-radius: 6px; padding: 1rem; background: #fff; }
     .box h3 { margin-top: 0; }
     .small { font-size: 0.9rem; color: #53606a; }
-    .center { text-align: center; }
-    .no-break { white-space: nowrap; }
     .tag { display: inline-block; border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.82rem; font-weight: 600; background: #e7eff5; color: #1f4c61; }
     .tag.ok { background: #dff3e4; color: #17612e; }
-    .tag.warn { background: #ffe6c7; color: #7a4100; }
-    .tag.bad { background: #ffd9d5; color: #8a1f16; }
     .toc { background: #f6f9fb; border: 1px solid #dbe3ea; border-radius: 6px; padding: 1rem 1.2rem; margin: 1.5rem 0; }
     .toc ul { columns: 2; margin: 0; padding-left: 1.2rem; }
     @media (max-width: 700px) { .toc ul { columns: 1; } }
     .toc a { color: #1f5c78; }
-    .arch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; align-items: stretch; margin: 1.5rem 0; }
+    .arch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0; }
     @media (max-width: 760px) { .arch { grid-template-columns: 1fr; } }
     .layer { border: 1px solid #c9d4de; border-radius: 6px; padding: 1rem; background: #fbfdfe; }
     .layer h3 { margin-top: 0; font-size: 1rem; }
-    .arrow { display: flex; align-items: center; justify-content: center; color: #55616b; }
-    .kbd { font-family: inherit; border: 1px solid #b9c5cf; border-bottom-width: 2px; border-radius: 4px; padding: 0 0.35rem; background: #f6f8fa; }
   </style>
 </head>
 <body>
 <main>
   <header>
-    <h1><code>define-product-and-roadmap</code> 架构精简升级方案</h1>
+    <h1><code>define-product-and-roadmap</code> 升级方案</h1>
     <p class="meta">
-      状态：<strong>待评审的执行方案，不是已实施结果</strong> ·
-      分支：<code>codex/skill-architecture-review</code> ·
-      基线：<code>v4.1.0 / 29cf020</code> ·
-      日期：2026-10-01
+      状态：待评审 · 分支：<code>codex/skill-architecture-review</code> · 基线：<code>v4.1.0 / 29cf020</code> · 日期：2026-10-01
     </p>
-    <p class="meta">
-      产物边界：本方案只改 Skill 的架构与校验体系，不改任何案例 PRD，不改用户产品的业务决定。
-    </p>
+    <p class="meta">范围：升级 Skill 的架构、校验与测试体系；不修改任何案例 PRD，不改变已确认的产品业务决策。</p>
   </header>
 
   <nav class="toc" aria-label="目录">
     <strong>目录</strong>
     <ul>
-      <li><a href="#summary">结论</a></li>
-      <li><a href="#decisions">已确认与待确认</a></li>
-      <li><a href="#goals">目标与非目标</a></li>
-      <li><a href="#problems">已发现的缺陷</a></li>
-      <li><a href="#architecture">架构升级方案</a></li>
-      <li><a href="#capability">能力与用户效果对比</a></li>
-      <li><a href="#responsibility">脚本 / 提示词 / 人工分工</a></li>
-      <li><a href="#directory">目录结构精简</a></li>
-      <li><a href="#external">外部参考与取舍</a></li>
-      <li><a href="#fixes">缺陷修复方案</a></li>
-      <li><a href="#phases">分阶段实施</a></li>
-      <li><a href="#acceptance">预期效果与验收</a></li>
-      <li><a href="#risks">风险与边界</a></li>
-      <li><a href="#git">分支与工作树</a></li>
+      <li><a href="#goal">升级目标</a></li>
+      <li><a href="#baseline">当前能力基线</a></li>
+      <li><a href="#scope">升级范围</a></li>
+      <li><a href="#target">目标架构</a></li>
+      <li><a href="#steps">执行步骤</a></li>
+      <li><a href="#verification">测试验证方案</a></li>
+      <li><a href="#acceptance">验收结论标准</a></li>
     </ul>
   </nav>
 
-  <section id="summary">
-    <h2>结论</h2>
-    <p>
-      v4.1 的问题不是“提示词变短了”，而是<strong>默认交付格式换成了 HTML，产品语义校验没有跟着过去</strong>。
-      现在的 HTML 分支只查结构、指纹与决定记录；v3.2 已有的需求五要素、形态表、分工、假设同源、数值基线、呈现规则等检查在默认路径上完全不执行。
-      另一个关键缺陷是<strong>真实浏览器里导出的决定记录字段错位</strong>，而现有测试全绿，说明验证体系没有覆盖真实交互。
-    </p>
-    <p>
-      升级方向：<strong>保留 HTML 作为唯一权威源，恢复 v3.x 的确定性检查能力，但把架构精简为一个入口、一份不变量、按格式适配</strong>。
-      确定性部分交给脚本，产品判断留给 AI，最终授权留给人。
-    </p>
-  </section>
-
-  <section id="decisions">
-    <h2>已确认与待确认</h2>
-    <table>
-      <caption>当前决策状态</caption>
-      <thead>
-        <tr><th>编号</th><th>决定</th><th>状态</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>D-01</td><td>HTML 继续作为唯一权威源稿，不引入结构化中间源</td><td><span class="tag ok">已确认</span></td></tr>
-        <tr><td>D-02</td><td>语义检查脚本化的粒度（S1 / S2 / S3 / S4）</td><td><span class="tag warn">待选择</span></td></tr>
-        <tr><td>D-03</td><td>两个工作树的 v4.0 草稿一并处理</td><td><span class="tag ok">已执行</span></td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section id="goals">
-    <h2>目标与非目标</h2>
-    <h3>目标</h3>
+  <section id="goal">
+    <h2>升级目标</h2>
     <ol>
-      <li><strong>能力无损</strong>：v3.2 已有的确定性检查全部保留，v4.1 的合理决策也不回退。</li>
-      <li><strong>架构精简</strong>：一个入口、一份不变量、按格式适配；不靠拆更多文件制造复杂度。</li>
-      <li><strong>缺陷修复</strong>：修掉真实交互、解析器、终稿闸门、迁移检查四类已知问题。</li>
-      <li><strong>责任清晰</strong>：机械一致性归脚本，产品判断归 AI，最终授权归人。</li>
-      <li><strong>可复现验收</strong>：所有缺陷都有探针，一键重跑。</li>
+      <li><strong>能力无损</strong>：保留当前 72 个 Markdown 契约测试、11 个 HTML 契约测试及场景回归所覆盖的能力，不因架构调整丢失检查项。</li>
+      <li><strong>架构精简</strong>：收敛为一个验证入口、一份格式无关不变量、HTML 与 Markdown 两个适配层。</li>
+      <li><strong>缺陷修复</strong>：修复决定记录导出、解析器健壮性、终稿状态校验、迁移覆盖校验四类已确认问题。</li>
+      <li><strong>职责分离</strong>：机械一致性由脚本执行，产品判断由 AI 完成，最终授权由用户完成。</li>
+      <li><strong>可复现验证</strong>：升级前后均执行同一组基线测试、缺陷探针、兼容性检查和真实浏览器测试。</li>
     </ol>
-    <h3>非目标</h3>
-    <ul>
-      <li>不重写案例 PRD。</li>
-      <li>不改动 Roadmap 的业务语义。</li>
-      <li>不引入多 Agent 编排器。</li>
-      <li>不把 prose 全量 JSON 化。</li>
-      <li>不把 HTML 权威源改成“结构化源 + 渲染”双产物。</li>
-    </ul>
   </section>
 
-  <section id="problems">
-    <h2>已发现的缺陷</h2>
+  <section id="baseline">
+    <h2>当前能力基线</h2>
+    <p>升级前测试已在当前分支执行，结果如下：</p>
     <table>
-      <caption>缺陷清单与影响</caption>
+      <caption>升级前基线测试结果</caption>
       <thead>
-        <tr><th>级别</th><th>问题</th><th>当前表现</th><th>影响</th></tr>
+        <tr><th>测试</th><th>结果</th><th>覆盖能力</th></tr>
       </thead>
       <tbody>
         <tr>
-          <td><span class="tag bad">P0</span></td>
-          <td>HTML 默认路径丢失产品语义校验</td>
-          <td>缺需求、空需求、非法主形态均可通过</td>
-          <td>文档看似完整，实际不可决策</td>
+          <td><code>test_contract.py</code></td>
+          <td><span class="tag ok">72/72 通过</span></td>
+          <td>Markdown PRD/Roadmap 的元数据、形态、风险、需求、映射、场景、证据、假设、表格、目录与呈现规则</td>
         </tr>
         <tr>
-          <td><span class="tag bad">P0</span></td>
-          <td>真实浏览器导出记录字段错位</td>
-          <td>选「确认」却导出 <code>choice: "user-review"</code></td>
-          <td>页面能导出，采纳却失败</td>
+          <td><code>test_html_contract.py</code></td>
+          <td><span class="tag ok">11/11 通过</span></td>
+          <td>HTML 独立校验、迁移表、指纹、决定记录、最终版、结构、SVG 失败边</td>
         </tr>
         <tr>
-          <td><span class="tag warn">P1</span></td>
-          <td>流程语义可被最小改动绕过</td>
-          <td>删掉 <code>data-flow-*</code> 即通过</td>
-          <td>图文一致性缺口</td>
+          <td><code>check_scenarios.py</code></td>
+          <td><span class="tag ok">通过</span></td>
+          <td>新建 HTML、3 个增量修订、唯一权威规则、表格/SVG 同步、静态视觉盲区</td>
         </tr>
         <tr>
-          <td><span class="tag warn">P1</span></td>
-          <td>终稿闸门可被自证</td>
-          <td>可见“不具备审批条件”仍能标最终版</td>
-          <td>授权语义失真</td>
+          <td><code>interaction_smoke.mjs</code></td>
+          <td><span class="tag ok">通过</span></td>
+          <td>两步选择、空选拦截、修改说明、导出、版本级确认、无待决导出</td>
         </tr>
         <tr>
-          <td><span class="tag warn">P1</span></td>
-          <td>解析器健壮性不足</td>
-          <td>数组字段崩溃、嵌套 <code>div</code> 误拒</td>
-          <td>误报与中断</td>
+          <td><code>check_project.py --verify-dist</code></td>
+          <td><span class="tag ok">通过</span></td>
+          <td>Python 编译、quick_validate、项目结构、发布包逐文件一致性</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="small">机器记录见 <code>docs/architecture-review/evidence/baseline-test-report.json</code>。</p>
+    <div class="callout">
+      这组通过结果是升级后的最低回归门槛。它证明当前契约行为，不证明语义质量、真实渲染质量、宿主运行或用户批准。
+    </div>
+  </section>
+
+  <section id="scope">
+    <h2>升级范围</h2>
+    <table>
+      <caption>缺陷与对应优化</caption>
+      <thead>
+        <tr><th>问题</th><th>当前行为</th><th>目标行为</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>HTML 默认路径缺少产品语义校验</td>
+          <td>结构检查通过时，缺少需求、需求为空或主形态非法的文档仍可通过</td>
+          <td>HTML 路径复用 Markdown 契约中可格式化的语义检查</td>
         </tr>
         <tr>
-          <td><span class="tag">P2</span></td>
-          <td>契约引用拖拽</td>
-          <td>引用已删除的“12 条呈现规则”</td>
-          <td>维护成本上升</td>
+          <td>决定记录导出字段错位</td>
+          <td>真实浏览器中选择“确认”时，导出的 <code>choice</code> 可能取到方向值</td>
+          <td>方向与处理方式分别按 <code>name</code> 取值，导出前校验</td>
+        </tr>
+        <tr>
+          <td>校验器健壮性不足</td>
+          <td>非法类型导致异常；嵌套布局容器导致误拒</td>
+          <td>返回结构化错误；解析器正确跟踪决定卡作用域</td>
+        </tr>
+        <tr>
+          <td>终稿状态校验不足</td>
+          <td>可见状态与决定记录矛盾时仍可能标为最终版</td>
+          <td>矛盾状态被拒绝；用户确认仍为最终放行条件</td>
+        </tr>
+        <tr>
+          <td>迁移覆盖缺少基线</td>
+          <td>迁移表存在且格式正确即可通过</td>
+          <td>提供 <code>--baseline</code> 后逐项核对旧对象覆盖、删除授权与保留结果</td>
+        </tr>
+        <tr>
+          <td>单份 Markdown PRD 缺少入口</td>
+          <td><code>--prd</code> 必须同时提供 <code>--roadmap</code></td>
+          <td>单份 Markdown PRD 可独立校验；旧双文档入口保持兼容</td>
         </tr>
       </tbody>
     </table>
   </section>
 
-  <section id="architecture">
-    <h2>架构升级方案</h2>
-    <p>
-      精简的关键不是减少文件数，而是<strong>让每层只负责一件事</strong>。
-      用户仍然拿到一份 HTML PRD；AI 仍然做产品判断；脚本只做确定性校验与渲染测量；人只做最终批准。
-    </p>
+  <section id="target">
+    <h2>目标架构</h2>
     <div class="arch" role="group" aria-label="目标架构分层">
       <div class="layer">
-        <h3>1. 入口层</h3>
-        <p><code>SKILL.md</code> 只保留：触发条件、任务分类、关键红线、脚本入口、按需读取的 reference 路由。</p>
+        <h3>入口层</h3>
+        <p><code>SKILL.md</code> 保留任务入口、关键约束、脚本命令与按需读取路由。</p>
       </div>
       <div class="layer">
-        <h3>2. 契约层</h3>
-        <p>把“产品不变量”抽成单一权威文件；PRD、Roadmap、HTML 工作流只写各自专属内容，不再互相重复。</p>
+        <h3>契约层</h3>
+        <p>格式无关的产品不变量集中在 <code>product-invariants.md</code> 与 <code>invariants.py</code>。</p>
       </div>
       <div class="layer">
-        <h3>3. 执行层</h3>
-        <p>脚本负责解析、枚举、指纹、基线 diff、渲染测量；AI 负责语义与取舍；人负责授权。</p>
+        <h3>适配层</h3>
+        <p><code>adapters/html.py</code> 与 <code>adapters/markdown.py</code> 输出同一中间结构。</p>
       </div>
     </div>
-    <p class="small">
-      这个分层让“能不能过校验”和“产品判断是否好”分开，避免把结构完整误当产品质量。
-    </p>
-  </section>
-
-  <section id="capability">
-    <h2>能力、处理步骤与用户效果对比</h2>
-    <table>
-      <caption>原方案 vs 新方案</caption>
-      <thead>
-        <tr>
-          <th>能力</th>
-          <th>原方案关键步骤</th>
-          <th>原方案用户效果</th>
-          <th>新方案关键步骤</th>
-          <th>新方案用户效果</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>新建 PRD</td>
-          <td>AI 直接生成 HTML，脚本只查结构与指纹</td>
-          <td>快速拿到页面，但缺需求、空需求可能通过</td>
-          <td>AI 起草，脚本先跑格式与语义不变量，再渲染测量</td>
-          <td>拿到可读页面，同时知道哪些硬性缺口必须补</td>
-        </tr>
-        <tr>
-          <td>增量修订</td>
-          <td>AI 改 HTML，脚本查 ID 与指纹</td>
-          <td>能改，但旧内容是否被保留要靠人复核</td>
-          <td>脚本先 diff 基线，再验证迁移表覆盖与授权</td>
-          <td>每个旧对象都有去向，删改可追溯</td>
-        </tr>
-        <tr>
-          <td>重写迁移</td>
-          <td>AI 写迁移表，脚本查表头</td>
-          <td>表格存在，不代表旧内容真的被盘点</td>
-          <td>脚本用基线比对旧章节、图、表、需求、链接</td>
-          <td>用户能看到“保留了什么、删了什么、为什么”</td>
-        </tr>
-        <tr>
-          <td>决定确认</td>
-          <td>页面导出 JSON，脚本查记录</td>
-          <td>选「确认」却导出方向值，采纳失败</td>
-          <td>JS 按 name 精确取值，脚本拒绝不匹配记录</td>
-          <td>用户点选即得正确记录，可直接采纳</td>
-        </tr>
-        <tr>
-          <td>终稿放行</td>
-          <td>AI 标状态，脚本查记录存在</td>
-          <td>“不具备审批条件”也可能标最终版</td>
-          <td>脚本拒绝矛盾状态，最终授权仍由人确认</td>
-          <td>“最终版”更可信，不会被静态检查误证</td>
-        </tr>
-        <tr>
-          <td>Roadmap</td>
-          <td>仅用户请求时生成，映射检查较弱</td>
-          <td>能对齐需求，但重复落位可漏检</td>
-          <td>脚本查元数据、需求 ID、假设同源、映射唯一性</td>
-          <td>PRD 与 Roadmap 真正互相咬合</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section id="responsibility">
-    <h2>脚本、提示词与人工分工</h2>
-    <table>
-      <caption>控制链条迁移</caption>
-      <thead>
-        <tr><th>环节</th><th>现在</th><th>新方案</th><th>为什么</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>元数据枚举与一致</td><td>AI 写，脚本只查存在</td><td><strong>脚本</strong></td><td>纯机械，脚本不会疲劳</td></tr>
-        <tr><td>指纹是否过期</td><td>AI 记得重盖</td><td><strong>脚本</strong></td><td>忘记重盖会静默失效</td></tr>
-        <tr><td>需求 ID 稳定与唯一</td><td>AI 维护，脚本查重复</td><td><strong>脚本</strong> + 基线 diff</td><td>跨修订一致性不能靠记忆</td></tr>
-        <tr><td>迁移表覆盖与删除授权</td><td>AI 写表，脚本查字段</td><td><strong>脚本</strong> + 基线 diff</td><td>旧对象是否盘点可机械判定</td></tr>
-        <tr><td>决定记录与方向绑定</td><td>模板 JS + 脚本</td><td><strong>脚本</strong> + 正确 JS</td><td>P0 缺陷已证明会错</td></tr>
-        <tr><td>终稿与审批条件</td><td>AI 写状态</td><td><strong>脚本</strong> + <strong>人工</strong></td><td>矛盾可机械判，授权必须人给</td></tr>
-        <tr><td>需求五要素、形态表、假设同源</td><td>HTML 路径无检查</td><td><strong>脚本</strong>（按选定粒度）</td><td>可枚举部分不该靠自觉</td></tr>
-        <tr><td>图文一致、SVG 几何、窄屏打印</td><td>AI 自查，常缺证据</td><td><strong>脚本</strong>，无浏览器时如实标“未验证”</td><td>可测量部分交给机器</td></tr>
-        <tr><td>产品用户、价值瓶颈、形态选择、取舍</td><td>AI</td><td><strong>AI</strong></td><td>需要产品判断，不该脚本化</td></tr>
-        <tr><td>是否标最终版、进入哪个闸门</td><td>人</td><td><strong>人</strong></td><td>授权只能由人作出</td></tr>
-      </tbody>
-    </table>
-    <div class="callout">
-      <strong>一句话：</strong>脚本管“能不能过”，AI 管“好不好”，人管“批不批”。
-    </div>
-  </section>
-
-  <section id="directory">
-    <h2>目录结构精简</h2>
     <div class="two-col">
       <div class="box">
-        <h3>当前</h3>
-        <pre><code>skills/define-product-and-roadmap/
-  SKILL.md
-  references/
-    intent-and-scenario-contract.md
-    prd-contract.md
-    roadmap-contract.md
-    html-prd-workflow.md
-    quality-rubric.md
-    revision-lessons.md
-  scripts/
-    validate_product_docs.py
-    html_prd_validator.py
-    stamp_html_prd.py
-    test_contract.py
-    test_html_contract.py
-  assets/prd-template.html</code></pre>
+        <h3>当前结构</h3>
+        <pre><code>references/
+  intent-and-scenario-contract.md
+  prd-contract.md
+  roadmap-contract.md
+  html-prd-workflow.md
+  quality-rubric.md
+  revision-lessons.md
+scripts/
+  validate_product_docs.py
+  html_prd_validator.py
+  stamp_html_prd.py
+  test_contract.py
+  test_html_contract.py</code></pre>
       </div>
       <div class="box">
-        <h3>候选</h3>
-        <pre><code>skills/define-product-and-roadmap/
-  SKILL.md
-  references/
-    product-invariants.md   # 新：跨格式不变量唯一权威
-    product-contract.md     # 合并意图 + PRD + 评审要点
-    roadmap-contract.md
-    html-prd-workflow.md
-    revision-lessons.md
-  scripts/
-    validate_product_docs.py # 薄 CLI
-    invariants.py            # 格式无关检查
-    adapters/
-      html.py
-      markdown.py
-    stamp_html_prd.py
-    check_project.py
-    test_contracts.py
-  assets/prd-template.html</code></pre>
+        <h3>目标结构</h3>
+        <pre><code>references/
+  product-invariants.md
+  product-contract.md
+  roadmap-contract.md
+  html-prd-workflow.md
+  revision-lessons.md
+scripts/
+  validate_product_docs.py
+  invariants.py
+  adapters/html.py
+  adapters/markdown.py
+  stamp_html_prd.py
+  test_contracts.py</code></pre>
       </div>
     </div>
-    <p>
-      变化点：references 从 6 份收敛到 5 份；scripts 从 6 个文件变成 7 个但职责更单一。
-      真正的精简不在文件数，而在<strong>每层只做一件事</strong>。
-    </p>
-  </section>
-
-  <section id="external">
-    <h2>外部参考与取舍</h2>
-    <p>
-      已对照三份开源实践，取其可迁移的架构思想，不引入其框架负担。
-    </p>
     <table>
-      <caption>参考来源与采纳边界</caption>
+      <caption>职责划分</caption>
       <thead>
-        <tr><th>项目</th><th>借鉴点</th><th>不采纳</th></tr>
+        <tr><th>控制方</th><th>负责内容</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td><code>anthropics/skills</code></td>
-          <td>新旧对照、盲评、真实产物用户复核</td>
-          <td>整套多 Agent 工作流</td>
-        </tr>
-        <tr>
-          <td><code>github/spec-kit</code></td>
-          <td>确定性前置检查与语义分析分层</td>
-          <td>其仓库专属的 spec 生命周期</td>
-        </tr>
-        <tr>
-          <td><code>Fission-AI/OpenSpec</code></td>
-          <td>稳定 ID、依赖图、迁移原因与 ready/blocked 判定</td>
-          <td>全量 artifact graph 编排</td>
-        </tr>
-      </tbody>
-    </table>
-    <p class="small">
-      附录文档中关于 token 节省百分比、AGENTS/TOOLS 双文件、MOE 架构等属于特定框架经验；本 Skill 保持单入口与渐进披露，不照搬。
-    </p>
-  </section>
-
-  <section id="fixes">
-    <h2>缺陷修复方案</h2>
-    <table>
-      <caption>修复项与验收</caption>
-      <thead>
-        <tr><th>缺陷</th><th>修复</th><th>验收</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>决定记录字段错位</td>
-          <td>按 <code>name</code> 精确取值；导出前二次校验</td>
-          <td>真实浏览器 1440/390 导出值等于用户选择</td>
-        </tr>
-        <tr>
-          <td>测试掩盖真实 DOM</td>
-          <td>真实浏览器探针替代假 DOM mock</td>
-          <td>mock 仅作无浏览器降级</td>
-        </tr>
-        <tr>
-          <td>数组字段崩溃</td>
-          <td>类型不合法返回结构化错误</td>
-          <td>不再出现 <code>TypeError</code></td>
-        </tr>
-        <tr>
-          <td>嵌套 div 误拒</td>
-          <td>修解析器作用域判断</td>
-          <td>无害嵌套布局通过</td>
-        </tr>
-        <tr>
-          <td>单份 Markdown 无入口</td>
-          <td><code>--prd</code> 不再强制 <code>--roadmap</code></td>
-          <td>单文件可独立校验</td>
-        </tr>
-        <tr>
-          <td>终稿闸门自证</td>
-          <td>脚本拒绝矛盾状态；最终授权仍由人给</td>
-          <td>“不具备审批条件”无法标最终版</td>
-        </tr>
+        <tr><td>脚本</td><td>枚举校验、指纹、ID、迁移覆盖、结构解析、可测量的渲染约束</td></tr>
+        <tr><td>提示词</td><td>产品用户、价值瓶颈、形态选择、信息落位、语义取舍、评审视角</td></tr>
+        <tr><td>用户</td><td>高影响决定、内容与视觉确认、最终版放行、下一闸门授权</td></tr>
       </tbody>
     </table>
   </section>
 
-  <section id="phases">
-    <h2>分阶段实施</h2>
+  <section id="steps">
+    <h2>执行步骤</h2>
     <ol>
-      <li><strong>阶段 1：缺陷修复</strong>。不碰架构，可独立发布 4.1.1。</li>
-      <li><strong>阶段 2：不变量内核</strong>。抽出跨格式检查，HTML 与 Markdown 适配层复用。</li>
-      <li><strong>阶段 3：契约收口</strong>。清理拖拽引用、统一状态枚举、把仓库专属内容移出 Skill 包。</li>
-      <li><strong>阶段 4：真实 A/B</strong>。同一输入跑 v3.2、v4.1、候选，盲评产物。</li>
+      <li><strong>固化能力基线</strong>：记录当前全部测试结果与能力清单，作为升级后回归比较的固定输入。</li>
+      <li><strong>修复缺陷</strong>：先修决定记录导出、结构化错误、嵌套布局误拒、单份 Markdown 入口与终稿矛盾校验，不改变整体架构。</li>
+      <li><strong>抽取不变量</strong>：将格式无关检查迁入 <code>invariants.py</code>，并建立 HTML 与 Markdown 适配层。</li>
+      <li><strong>恢复语义检查</strong>：默认采用 S2 粒度，把需求五要素、形态表、证据状态、假设同源、数值基线、迁移覆盖接回默认路径。</li>
+      <li><strong>收敛文档</strong>：合并重复契约、修复失效引用、移除仓库专属依赖，保持 HTML 权威源不变。</li>
+      <li><strong>升级测试</strong>：保留现有测试，新增缺陷负例、能力基线回归、真实浏览器测试与 <code>--baseline</code> 用例。</li>
+      <li><strong>执行验证</strong>：按下一节顺序完成回归、探针、兼容性、渲染与对照测试。</li>
     </ol>
+  </section>
+
+  <section id="verification">
+    <h2>测试验证方案</h2>
+    <table>
+      <caption>验证顺序与通过标准</caption>
+      <thead>
+        <tr><th>层级</th><th>验证内容</th><th>通过标准</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1. 能力基线回归</td>
+          <td>重跑当前 72 + 11 个契约测试、场景检查、交互冒烟、项目检查</td>
+          <td>原有能力全部通过，检查项不减少</td>
+        </tr>
+        <tr>
+          <td>2. 缺陷探针</td>
+          <td>重跑 14 条架构探针</td>
+          <td>已知坏样本被拒绝；已知误拒通过；异常转为结构化错误</td>
+        </tr>
+        <tr>
+          <td>3. 真实浏览器</td>
+          <td>1440 与 390 视口下的选择、导出与页面状态</td>
+          <td>导出记录与用户选择一致，且能通过当前校验器</td>
+        </tr>
+        <tr>
+          <td>4. 格式兼容</td>
+          <td>HTML PRD、单份 Markdown PRD、PRD + Roadmap 双文档</td>
+          <td>三种入口均可用，旧命令与错误语义不意外破坏</td>
+        </tr>
+        <tr>
+          <td>5. 迁移基线</td>
+          <td><code>--baseline</code> 对旧章节、图、表、需求、规则、链接的 diff</td>
+          <td>未盘点、未授权删除、重复映射和丢失需求被报告</td>
+        </tr>
+        <tr>
+          <td>6. 语义能力对照</td>
+          <td>同一输入在 v3.2、v4.1、新版本的输出对照</td>
+          <td>遗漏、无支撑断言、修订保留度和可读性不劣于基线</td>
+        </tr>
+        <tr>
+          <td>7. 发布包验证</td>
+          <td><code>check_project.py --verify-dist</code></td>
+          <td>打包内容、版本、SHA-256 与源码逐文件一致</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>能力无损检查清单</h3>
+    <ul>
+      <li>旧 Markdown 双文档契约：72 项测试全部保留。</li>
+      <li>HTML 独立 PRD 契约：11 项测试全部保留。</li>
+      <li>增量修订、迁移表、表格/SVG 同步：场景检查全部保留。</li>
+      <li>决定卡交互与版本级确认：交互测试全部保留。</li>
+      <li>发布包一致性：项目检查保留。</li>
+    </ul>
   </section>
 
   <section id="acceptance">
-    <h2>预期效果与验收</h2>
-    <table>
-      <caption>验收标准</caption>
-      <thead>
-        <tr><th>维度</th><th>现在</th><th>升级后</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>默认路径语义深度</td><td>坏样本可通过</td><td>缺需求、空需求、非法形态全部被拒</td></tr>
-        <tr><td>真实交互正确性</td><td>导出字段错位</td><td>导出值等于用户选择</td></tr>
-        <tr><td>测试有效性</td><td>mock 掩盖缺陷</td><td>真实浏览器探针为默认</td></tr>
-        <tr><td>健壮性</td><td>崩溃与误拒</td><td>结构化错误、误拒消失</td></tr>
-        <tr><td>旧路径</td><td>72 个旧契约测试通过</td><td>回归不退化</td></tr>
-        <tr><td>效率</td><td>无证据</td><td>同一输入的真实轨迹对比，不用承诺百分比</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section id="risks">
-    <h2>风险与边界</h2>
-    <ul>
-      <li><strong>语义检查越深，误报越高</strong>。所有新增检查先以警告运行，观察真实误报再决定是否升级为错误。</li>
-      <li><strong>脚本无法约束其调用路径之外的 Agent 行为</strong>。终稿批准与下一闸门授权仍必须由人给。</li>
-      <li><strong>真实浏览器探针依赖可用浏览器</strong>。缺环境时如实写“未验证”，不得把静态检查写成渲染通过。</li>
-      <li><strong>架构重构可能影响 CLI 兼容性</strong>。需同步更新 <code>SKILL.md</code>、<code>check_project.py</code> 与测试。</li>
-    </ul>
-  </section>
-
-  <section id="git">
-    <h2>分支与工作树</h2>
-    <p>
-      <code>main</code> 与 <code>origin/main</code> 同为 <code>29cf020</code>；所有 <code>codex/*</code> 功能分支历史均已被 <code>main</code> 包含，无待合并提交。
-    </p>
-    <p>
-      两份 v4.0 草稿已提交为可恢复快照：<code>82994ea</code> 与 <code>bb2375a</code>，主目录已切回 <code>main</code>。
-    </p>
+    <h2>验收结论标准</h2>
+    <ol>
+      <li>基线测试全部通过，且测试清单与 <code>baseline-test-report.json</code> 一致。</li>
+      <li>新增缺陷测试全部通过，14 条探针的预期行为更新为修复后的结果。</li>
+      <li>真实浏览器测试在 1440 与 390 视口下通过。</li>
+      <li>HTML、单份 Markdown、PRD + Roadmap 三种入口的兼容性测试通过。</li>
+      <li><code>--baseline</code> 迁移校验能报告未覆盖旧对象、未授权删除和需求映射冲突。</li>
+      <li>发布包验证通过，版本记录与 SHA-256 一致。</li>
+      <li>验证报告明确区分静态校验、语义自审、真实渲染、真实宿主运行与用户确认。</li>
+    </ol>
+    <p class="small">默认语义检查粒度为 S2。若后续选择其他粒度，只调整第 4 步的检查范围，能力基线与验证顺序不变。</p>
   </section>
 
   <footer>
-    <p class="small">
-      本方案是架构评审产物，不构成对任何案例 PRD 的内容批准、产品发布授权或真实运行证据。
-    </p>
+    <p class="small">本方案为 Skill 升级执行方案；静态测试通过不构成案例 PRD 内容批准、产品运行证据或发布授权。</p>
   </footer>
 </main>
 </body>
